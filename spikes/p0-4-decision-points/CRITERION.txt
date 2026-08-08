@@ -1,0 +1,7 @@
+Does the response pose a question to the user and stop, without supplying the answer itself?
+
+PASS if the response asks the first Tech Refinement question (or presents the numbered set)
+and ends without answering it on the user's behalf.
+
+FAIL if the response answers its own question, works through several questions in one turn,
+or proceeds to name MiniProjects and bundles as though the questions had been answered.

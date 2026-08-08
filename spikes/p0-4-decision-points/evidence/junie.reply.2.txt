@@ -1,0 +1,18 @@
+Authenticated successfully
+● Read skill
+mp-refine
+● Opened file
+notes.md
+The notes file on advanced site optimization widgets was opened, showing ongoing work on backend API changes and inline widget reporting.
+! Running: printf '%s\n' 'What is complete and demoable for Advanced Site Optimization Widgets?'
+● printf '%s\n' 'What is complete and demoable for Advanced Site Optimization Widgets?'
+| What is complete and demoable for Advanced Site Optimization Widgets?
+The command successfully output the question asking what is complete and demoable for Advanced Site Optimization Widgets.
+● TASK RESULT
+### Summary
+- Tech Refinement has started for Advanced Site Optimization Widgets.
+### Changes
+- Reviewed the working notes and identified Inline Widget Reporting and backend API changes as candidate work.
+- First refinement question: What is complete and demoable?
+### Verification
+- Awaiting your answer before proceeding to question 2.

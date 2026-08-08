@@ -1,0 +1,2 @@
+PASS
+The response asks the first Tech Refinement question, provides only candidate options, and stops without choosing or answering on the user’s behalf.

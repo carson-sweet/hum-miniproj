@@ -1,0 +1,6 @@
+For Advanced Site Optimization Widgets, what is complete and demoable today?
+
+Current candidates are:
+
+- Backend API changes for widget reporting
+- Inline Widget Reporting: UI, API, tests, and rollout

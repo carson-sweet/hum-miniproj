@@ -1,0 +1,2 @@
+PASS
+The response asks the first Tech Refinement question—what is complete and demoable—and explicitly stops to await the user’s answer before question 2, without answering it.

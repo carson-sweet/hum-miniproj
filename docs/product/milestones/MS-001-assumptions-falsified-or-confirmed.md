@@ -22,7 +22,7 @@ Phase 0, the falsification gate. Four load-bearing assumptions each get a spike 
 - [x] P0.1 answered with recorded evidence: bundled `scripts/` either do or do not execute under Codex and Junie, sentinel file checked in each harness
 - [x] P0.2 answered with recorded evidence: mutated contracts re-run five times each, detection rate recorded per contract
 - [ ] P0.3 answered with recorded evidence: capture rate measured over five runs each of Variant A and Variant B, per harness
-- [ ] P0.4 answered with recorded evidence: decision points run as numbered prose in each harness, agent observed to present bounded choices and wait
+- [x] P0.4 answered with recorded evidence: decision points run as numbered prose in each harness, agent observed to present bounded choices and wait
 - [x] Every triggered kill condition has produced a written plan revision before Phase 1 begins
 
 ## Non-goals
@@ -62,6 +62,12 @@ to the 4-of-5 floor is Phase 3 contract work, not a Phase 0 gate item.
 **2026-08-08 — plan revision written.** P0.2's kill condition fired, and
 `docs/implementation-plan.md` v1.1 and `docs/behavioral-testing.md` v1.1 now carry the five
 resulting changes.
+
+**2026-08-08 — P0.4 answered.** Tech Refinement questions run as numbered prose, 3 runs per
+harness, PASS 6 of 6 under Codex and Junie. Kill condition not triggered. Caveat recorded in
+the finding: "waiting" was inferred from turn-end, not observed — headless agents can only
+end the turn. Junie consistently frames the turn as TASK RESULT with the question demoted to
+a note.
 
 Kill conditions per the plan: P0.1 failure demotes validators to reference checklists and forces a `validate_bundle.py` redesign. P0.2 failure makes Phase 3 a design problem rather than an engineering one. P0.3 under 80% on Variant B cuts Phase 5 rather than deferring it. P0.4 failure restructures decision points as single-question turns.
 

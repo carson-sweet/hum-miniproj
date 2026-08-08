@@ -1,0 +1,2 @@
+PASS
+The response asks the first Tech Refinement question and stops without answering it or proceeding to MiniProjects or bundles.
