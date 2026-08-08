@@ -1,6 +1,6 @@
 # Eval Harness — Codex CLI Driver
 
-**Version 1.0 — 2026-08-08**
+**Version 1.1 — 2026-08-08**
 
 How `eval/run_contracts.py` executes a contract against a real agent. Companion to
 [behavioral testing approach](behavioral-testing.md) and the
@@ -166,16 +166,20 @@ time, rather than reporting a confusing FAIL later.
 
 Each subject run gets a **disposable copy**, never the working tree:
 
-1. `tmp = mkdtemp()`
-2. Copy `fixtures/<name>/` → `tmp/`
-3. Install the skill under test into `tmp/.codex/skills/miniproject/` — the same path
-   `install.sh` targets, so the test exercises the real install shape
-4. Run `codex exec -C tmp`
-5. Assert against `tmp/`
-6. Delete `tmp` unless `--keep-workdirs`
+1. Create a temporary `CODEX_HOME` and symlink the real `auth.json` into it.
+2. Install the skill under test into `$CODEX_HOME/skills/<name>/`.
+3. Create a separate disposable fixture workdir and copy the fixture into it.
+4. Run `codex exec -C <workdir>` with `CODEX_HOME` set to the temporary home.
+5. Assert against the workdir.
+6. Delete both temporary roots (unless `--keep-workdirs` preserves the fixture).
 
 Copying is what makes negative controls safe. A mutation is applied to the copy, so a
 crashed run can never leave a mutated skill in the repo.
+
+The temporary home is a safety boundary, not test tidiness. Harness skills and persisted
+multi-turn sessions must never be installed in `~/.agents/skills`, `~/.codex/skills`, or
+`~/.codex/sessions`; those directories contain user-owned state. Authentication is linked,
+not copied, and the harness never reads or logs its payload.
 
 ---
 
@@ -260,6 +264,14 @@ These cost real time to discover. They are documented so nobody rediscovers them
    attribution silently vanishes. In JSON mode the id is `thread_id` on the
    `thread.started` event, not `session id`. Any driver supporting both modes needs both
    extraction paths, and a test for each.
+6. **`codex exec resume` accepts fewer options than `codex exec`.** It rejects `-s`, `-C`,
+   and `--color` with exit 2. The working directory is inherited, but a live regression
+   proved the sandbox falls back to read-only. Resume accepts `-c`, so the driver pins
+   `sandbox_mode="workspace-write"` (or `"read-only"`) through that supported override.
+7. **Noninteractive `codex delete` requires `--force`.** Without it, deletion cannot confirm
+   and silently leaves the session behind. Multi-turn cleanup targets only the recorded UUID,
+   inside the temporary `CODEX_HOME`; it never discovers cleanup targets by sweeping a
+   session directory.
 
 ---
 
@@ -326,4 +338,5 @@ mutation, steps 1–4 have produced a harness that has never been shown to work.
 
 | Version | Date       | Change summary                                                     |
 |---------|------------|--------------------------------------------------------------------|
+| 1.1     | 2026-08-08 | Isolated CODEX_HOME; documented resume and deletion constraints.   |
 | 1.0     | 2026-08-08 | Initial design, verified against codex-cli 0.145.0.                 |

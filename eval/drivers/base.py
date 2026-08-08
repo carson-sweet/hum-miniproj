@@ -31,6 +31,23 @@ class SubjectResult:
     usage: Usage | None = None
 
 
+@dataclass(frozen=True)
+class SessionResult:
+    """A multi-turn session persisted only inside a disposable harness home."""
+    session_id: str | None
+    turns: list[dict]
+    workdir: Path
+    usage: "Usage | None" = None
+    exit_codes: tuple[int, ...] = ()
+
+    @property
+    def ok(self) -> bool:
+        return bool(self.session_id) and all(c == 0 for c in self.exit_codes)
+
+    def completed(self, expected_turns: int) -> bool:
+        return self.ok and len(self.turns) == expected_turns
+
+
 class HarnessDriver(Protocol):
     name: str
 

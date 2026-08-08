@@ -27,7 +27,7 @@ import yaml
 from eval.assertions import check_artifact
 from eval.config import JUDGE_MODEL, SUBJECT_MODEL
 from eval.cost import format_totals, totals
-from eval.drivers.codex import CodexDriver
+from eval.drivers.codex import CodexDriver, isolated_codex_home
 from eval.judge import judge
 from eval.mutate import apply_mutation
 
@@ -36,8 +36,6 @@ CONTRACTS_DIR = REPO / "eval" / "contracts"
 SKILL_SRC = REPO / "spikes" / "p0-2-detection" / "skill"
 RUNS_DIR = REPO / "eval" / "runs"
 
-AGENTS_ROOT = Path.home() / ".agents" / "skills"
-HARNESS_SKILL_ROOT = {"codex": Path.home() / ".codex" / "skills"}
 DRIVERS = {"codex": CodexDriver}
 
 
@@ -88,49 +86,40 @@ def load_contracts(only: str | None) -> list[dict]:
     return out
 
 
-def install_skill(src: Path, harness: str) -> tuple[Path, Path]:
+def install_skill(src: Path, skill_root: Path) -> Path:
     name = yaml.safe_load(src.joinpath("SKILL.md").read_text().split("---")[1])["name"]
-    agents_dir = AGENTS_ROOT / name
-    link = HARNESS_SKILL_ROOT[harness] / name
-    for p in (agents_dir, link):
-        if p.exists() and not p.is_symlink():
-            raise SystemExit(f"refusing: {p} exists and is not ours")
-    uninstall(agents_dir, link)
-    agents_dir.parent.mkdir(parents=True, exist_ok=True)
-    link.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copytree(src, agents_dir)
-    link.symlink_to(agents_dir)
-    return agents_dir, link
-
-
-def uninstall(agents_dir: Path, link: Path) -> None:
-    if link.is_symlink():
-        link.unlink()
-    shutil.rmtree(agents_dir, ignore_errors=True)
+    destination = skill_root / name
+    if destination.exists():
+        raise SystemExit(f"refusing to overwrite isolated skill path: {destination}")
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(src, destination)
+    return destination
 
 
 def run_one(contract: dict, harness: str, negative: bool, keep: bool) -> Outcome:
     mode = "negative-control" if negative else "normal"
     cid = contract["id"]
-    driver = DRIVERS[harness]()
-    agents_dir, link = install_skill(SKILL_SRC, harness)
     work = Path(tempfile.mkdtemp(prefix=f"eval-{cid}-"))
 
     try:
-        if negative:
-            m = apply_mutation(agents_dir, contract["negative_control"]["mutate"])
-            if not m.applied:
-                return Outcome(cid, harness, mode, "MUTATION-INERT", m.detail)
+        with isolated_codex_home() as codex_home:
+            driver = DRIVERS[harness](codex_home=codex_home)
+            installed_skill = install_skill(SKILL_SRC, codex_home / "skills")
+            if negative:
+                m = apply_mutation(installed_skill, contract["negative_control"]["mutate"])
+                if not m.applied:
+                    return Outcome(cid, harness, mode, "MUTATION-INERT", m.detail)
 
-        shutil.copytree(contract["subject"]["fixture"], work, dirs_exist_ok=True)
-        sub = contract["subject"]
-        result = driver.run_subject(
-            fixture=work,
-            prompt=sub["prompt"],
-            model=SUBJECT_MODEL,
-            writable=sub.get("sandbox") == "workspace-write",
-            timeout_s=sub.get("timeout_s", 180),
-        )
+            shutil.copytree(contract["subject"]["fixture"], work, dirs_exist_ok=True)
+            sub = contract["subject"]
+            result = driver.run_subject(
+                fixture=work,
+                prompt=sub["prompt"],
+                model=SUBJECT_MODEL,
+                writable=sub.get("sandbox") == "workspace-write",
+                timeout_s=sub.get("timeout_s", 180),
+                events_file=work / ".subject.events.jsonl" if keep else None,
+            )
 
         if contract["assert"]["type"] == "artifact":
             checks = [
@@ -156,7 +145,6 @@ def run_one(contract: dict, harness: str, negative: bool, keep: bool) -> Outcome
         return Outcome(cid, harness, mode, verdict, reason, result.model,
                        result.session_id, round(result.duration_s, 1), details)
     finally:
-        uninstall(agents_dir, link)
         if keep:
             print(f"    workdir kept: {work}")
         else:

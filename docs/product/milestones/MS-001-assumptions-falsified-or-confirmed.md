@@ -74,6 +74,13 @@ floor (MP-C01 5/5, MP-C03 5/5, MP-C04 4/5 at the floor); MP-C02 remains broken a
 needs replacing. Subject model is a contract-design variable, recorded as plan revision v1.2.
 Full metered cost of the matrix: $0.2864.
 
+**2026-08-08 — P0.3 answered for Codex, Junie outstanding.** After isolating each run in a
+temporary `CODEX_HOME` and fixing two resume-command defects, the decision-eligible matrix
+completed with Variant A at 5/5 and Variant B at 4/5. All 30 turns exited 0; Variant B met
+the 80% threshold exactly, so the Phase 5 kill condition is not triggered for Codex. The
+criterion remains unchecked until five runs per variant are recorded under Junie. Evidence
+and the invalid-preflight analysis are in `spikes/p0-3-capture/FINDING.md`.
+
 Kill conditions per the plan: P0.1 failure demotes validators to reference checklists and forces a `validate_bundle.py` redesign. P0.2 failure makes Phase 3 a design problem rather than an engineering one. P0.3 under 80% on Variant B cuts Phase 5 rather than deferring it. P0.4 failure restructures decision points as single-question turns.
 
 ---
