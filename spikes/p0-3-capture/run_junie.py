@@ -14,8 +14,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 from eval.config import SUBJECT_MODEL
 from eval.drivers.junie import JunieDriver
+from eval.env import load_local_value
 
 HERE = Path(__file__).resolve().parent
+REPO = HERE.parent.parent
+LOCAL_ENV = REPO / ".env.local"
 SESSION = json.loads((HERE / "SESSION.json").read_text())
 SKILL_NAME = "mp-classify"
 
@@ -67,9 +70,16 @@ def main() -> int:
     parser.add_argument("--keep-workdirs", action="store_true")
     args = parser.parse_args()
 
-    if not os.environ.get("JUNIE_API_KEY"):
-        print("refusing: isolated Junie runs require JUNIE_API_KEY in the environment")
+    try:
+        loaded_local = load_local_value(LOCAL_ENV, "JUNIE_API_KEY")
+    except (OSError, ValueError) as exc:
+        print(f"refusing: {exc}")
         return 3
+    if not os.environ.get("JUNIE_API_KEY"):
+        print(f"refusing: add JUNIE_API_KEY to {LOCAL_ENV}")
+        return 3
+    if loaded_local:
+        print(f"loaded JUNIE_API_KEY from {LOCAL_ENV}")
 
     variants = ["a", "b"] if args.variant == "both" else [args.variant]
     rows, rates = [], {}

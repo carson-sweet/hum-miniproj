@@ -39,9 +39,11 @@ directory sweep was used.
 Junie supports a `JUNIE_HOME` override, but its macOS Keychain account is keyed to
 the absolute Junie-home path. Redirecting the home therefore removes access to
 the existing login. `run_junie.py` now enforces the safe boundary: it requires a
-pre-supplied `JUNIE_API_KEY`, creates a temporary `JUNIE_HOME`, redirects logs and
-cache beneath it, disables all default discovery locations, and refuses to fall
-back to the real user home. The Junie matrix is ready but credential-gated.
+`JUNIE_API_KEY`, creates a temporary `JUNIE_HOME`, redirects logs and cache beneath
+it, disables all default discovery locations, and refuses to fall back to the
+real user home. The key may be stored in the gitignored, mode-600 `.env.local`;
+the runner reads that one value directly without sourcing shell code. The Junie
+matrix is ready but credential-gated.
 
 ## Invalid and preliminary runs
 
