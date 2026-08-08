@@ -25,6 +25,8 @@ from pathlib import Path
 import yaml
 
 from eval.assertions import check_artifact
+from eval.config import JUDGE_MODEL, SUBJECT_MODEL
+from eval.cost import format_totals, totals
 from eval.drivers.codex import CodexDriver
 from eval.judge import judge
 from eval.mutate import apply_mutation
@@ -33,7 +35,6 @@ REPO = Path(__file__).resolve().parent.parent
 CONTRACTS_DIR = REPO / "eval" / "contracts"
 SKILL_SRC = REPO / "spikes" / "p0-2-detection" / "skill"
 RUNS_DIR = REPO / "eval" / "runs"
-MODEL = "gpt-5.6-sol"
 
 AGENTS_ROOT = Path.home() / ".agents" / "skills"
 HARNESS_SKILL_ROOT = {"codex": Path.home() / ".codex" / "skills"}
@@ -106,7 +107,7 @@ def run_one(contract: dict, harness: str, negative: bool, keep: bool) -> Outcome
         result = driver.run_subject(
             fixture=work,
             prompt=sub["prompt"],
-            model=MODEL,
+            model=SUBJECT_MODEL,
             writable=sub.get("sandbox") == "workspace-write",
             timeout_s=sub.get("timeout_s", 180),
         )
@@ -122,7 +123,7 @@ def run_one(contract: dict, harness: str, negative: bool, keep: bool) -> Outcome
             v = judge(
                 criterion=contract["assert"]["pass"],
                 subject_output=result.final_message,
-                model=MODEL,
+                model=JUDGE_MODEL,
             )
             passed, reason, details = v.passed, v.reason, []
 
@@ -155,8 +156,10 @@ def main() -> int:
     if not probe.ok:
         print(f"probe failed: {probe.detail}")
         return 3
+    started_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     print(f"harness {args.harness} ({probe.version})  mode "
-          f"{'negative-control' if args.negative_control else 'normal'}\n")
+          f"{'negative-control' if args.negative_control else 'normal'}")
+    print(f"subject {SUBJECT_MODEL}  judge {JUDGE_MODEL}\n")
 
     contracts = load_contracts(args.contract)
     if not contracts:
@@ -178,8 +181,11 @@ def main() -> int:
         for o in outcomes:
             fh.write(json.dumps({**o.__dict__, "cli_version": probe.version}) + "\n")
 
+    spend = totals(since=started_at)
+    (run_dir / "cost.json").write_text(json.dumps(spend, indent=2))
     verdicts = [o.verdict for o in outcomes]
     print(f"\n{len(outcomes)} contract(s). results: {run_dir}")
+    print("cost this run: " + format_totals(spend))
     if "MUTATION-INERT" in verdicts:
         print("MUTATION-INERT present — a mutation changed nothing, so it scored nothing.")
         return 3

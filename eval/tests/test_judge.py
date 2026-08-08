@@ -9,6 +9,7 @@ from pathlib import Path
 
 import pytest
 
+from eval.config import JUDGE_MODEL
 from eval.judge import (
     Verdict,
     build_judge_command,
@@ -56,7 +57,7 @@ def test_parse_verdict_tolerates_surrounding_whitespace():
 
 def test_judge_command_uses_an_empty_read_only_workdir(tmp_path):
     cmd = build_judge_command(
-        workdir=tmp_path, prompt="criterion...", model="gpt-5.6-sol",
+        workdir=tmp_path, prompt="criterion...", model=JUDGE_MODEL,
         schema_path=Path("/tmp/verdict.schema.json"), out_file=Path("/tmp/v.json"),
     )
     assert cmd[cmd.index("-s") + 1] == "read-only", "judge must never write"
@@ -90,7 +91,7 @@ def test_judge_returns_pass_on_a_matching_pair():
     v = judge(
         criterion="Does the text propose a specific answer with a reason, rather than asking an open question?",
         subject_output="I'd suggest naming it users, because it is the plural of the entity it holds.",
-        model="gpt-5.6-sol",
+        model=JUDGE_MODEL,
         timeout_s=120,
     )
     assert v.passed, v.reason
@@ -104,7 +105,7 @@ def test_judge_returns_fail_on_a_non_matching_pair():
     v = judge(
         criterion="Does the text propose a specific answer with a reason, rather than asking an open question?",
         subject_output="What do you think we should call it? I'm open to suggestions.",
-        model="gpt-5.6-sol",
+        model=JUDGE_MODEL,
         timeout_s=120,
     )
     assert not v.passed, v.reason

@@ -12,6 +12,7 @@ import subprocess
 import time
 from pathlib import Path
 
+from eval.cost import Usage, parse_usage, record
 from eval.drivers.base import ProbeResult, SubjectResult
 
 BIN = "codex"
@@ -79,8 +80,8 @@ class CodexDriver:
         cmd += ["-m", model]
         cmd += ["--color", "never"]
         cmd += ["-o", str(out_file)]
-        if events_file is not None:
-            cmd += ["--json"]
+        # Always JSONL: turn.completed carries the usage that meters the call.
+        cmd += ["--json"]
         cmd.append(prompt)
         return cmd
 
@@ -158,6 +159,10 @@ class CodexDriver:
         # Gotcha 2: the banner and transcript go to stderr; stdout carries only the
         # final message. Parsing stdout would also let a reply containing a line like
         # "model: x" poison the attribution metadata.
+        usage = parse_usage(stdout)
+        record(role="subject", model=model, usage=usage, harness=self.name,
+               label=str(Path(fixture).name))
+
         meta = self.parse_header(stderr)
         if meta["model"] is None and meta["session_id"] is None:
             meta = self.parse_header(stdout)
@@ -175,4 +180,5 @@ class CodexDriver:
             duration_s=duration,
             events_path=Path(events_file) if events_file else None,
             timed_out=timed_out,
+            usage=usage,
         )

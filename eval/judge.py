@@ -12,6 +12,7 @@ import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
+from eval.cost import parse_usage, record
 from eval.drivers.codex import BIN, ISOLATION_FLAGS
 
 SCHEMA_PATH = Path(__file__).parent / "schemas" / "verdict.schema.json"
@@ -80,7 +81,7 @@ def build_judge_command(
     cmd += ["-C", str(workdir)]
     cmd += ["-s", "read-only"]
     cmd += ["-m", model]
-    cmd += ["--color", "never"]
+    cmd += ["--color", "never", "--json"]
     cmd += ["--output-schema", str(schema_path)]
     cmd += ["-o", str(out_file)]
     cmd.append(prompt)
@@ -111,6 +112,7 @@ def judge(
             timeout=timeout_s,
             stdin=subprocess.DEVNULL,
         )
+        record(role="judge", model=model, usage=parse_usage(proc.stdout), harness="codex")
         if not out_file.exists():
             raise RuntimeError(
                 f"judge produced no verdict file (exit {proc.returncode}): "

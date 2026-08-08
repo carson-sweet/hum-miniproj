@@ -16,10 +16,11 @@ from pathlib import Path
 from eval.assertions import check_artifact
 from eval.drivers.codex import CodexDriver
 from eval.judge import judge
+from eval.config import JUDGE_MODEL
 
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "fixtures" / "throwaway"
-MODEL = "gpt-5.6-sol"
+from eval.config import SUBJECT_MODEL as MODEL
 
 PROMPT = (
     "Read notes.md. Write a file named bundle.md in the working directory that "
@@ -75,7 +76,7 @@ def main() -> int:
         verdict = judge(
             criterion=CRITERION,
             subject_output=result.final_message,
-            model=MODEL,
+            model=JUDGE_MODEL,
             timeout_s=120,
         )
         print(f"[2] judge        {verdict.verdict} — {verdict.reason}")

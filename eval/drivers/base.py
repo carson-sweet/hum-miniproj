@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
 
+from eval.cost import Usage
+
 
 @dataclass(frozen=True)
 class ProbeResult:
@@ -26,6 +28,7 @@ class SubjectResult:
     duration_s: float
     events_path: Path | None = None
     timed_out: bool = False
+    usage: Usage | None = None
 
 
 class HarnessDriver(Protocol):

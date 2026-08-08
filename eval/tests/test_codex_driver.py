@@ -10,6 +10,7 @@ from pathlib import Path
 
 import pytest
 
+from eval.config import SUBJECT_MODEL
 from eval.drivers.codex import CodexDriver
 
 
@@ -70,6 +71,7 @@ def test_command_uses_workspace_write_when_artifacts_expected(driver):
 
 
 def test_command_pins_model(driver):
+    """Literal on purpose: pinning must work for any model, not just the configured one."""
     cmd = cmd_for(driver, model="gpt-5.6-sol")
     assert cmd[cmd.index("-m") + 1] == "gpt-5.6-sol"
 
@@ -125,7 +127,7 @@ def test_subject_runs_and_writes_an_artifact(tmp_path):
     result = driver.run_subject(
         fixture=fixture,
         prompt="Create a file named bundle.md in the working directory containing a '## Owner' heading.",
-        model="gpt-5.6-sol",
+        model=SUBJECT_MODEL,
         writable=True,
         timeout_s=180,
     )
@@ -156,8 +158,14 @@ def test_events_parsing_survives_malformed_lines():
     assert CodexDriver.parse_events('{not json\n{"type":"thread.started","thread_id":"x"}\n') == "x"
 
 
-def test_command_requests_json_only_when_events_wanted(driver, tmp_path):
-    assert "--json" not in cmd_for(driver)
+def test_command_always_requests_json(driver, tmp_path):
+    """--json is not optional: turn.completed carries the usage that meters the call.
+
+    Replaces an earlier test asserting --json appeared only with events_file. That
+    behaviour changed deliberately when token accounting was added; an unmetered
+    call is now a defect, not a configuration.
+    """
+    assert "--json" in cmd_for(driver)
     assert "--json" in cmd_for(driver, events_file=tmp_path / "events.jsonl")
 
 
@@ -173,7 +181,7 @@ def test_attribution_survives_json_mode(tmp_path):
     result = driver.run_subject(
         fixture=fixture,
         prompt="Reply with the single word: ok",
-        model="gpt-5.6-sol",
+        model=SUBJECT_MODEL,
         writable=False,
         timeout_s=120,
         events_file=events,

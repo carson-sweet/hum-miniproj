@@ -25,7 +25,14 @@ python3 -m pytest -m integration
 
 # Prove the harness end to end on the throwaway fixture
 python3 -m eval.smoke
+
+# What have model calls cost?
+python3 -m eval.spend
 ```
+
+Every model call is metered to `eval/runs/ledger.jsonl`. Default models are the
+cheapest capable option (`gpt-5.6-luna`); override with `EVAL_SUBJECT_MODEL` /
+`EVAL_JUDGE_MODEL` when capability is genuinely the variable under test.
 
 Integration tests and the smoke run require `codex` on PATH and an authenticated
 Codex session. `python3 -m eval.smoke` exits 0 green, 1 red, 3 on probe failure.
