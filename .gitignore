@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.DS_Store
+*.egg-info/
+
+# Eval run outputs — regenerated, not source
+eval/runs/
