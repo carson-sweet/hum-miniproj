@@ -1,0 +1,30 @@
+### normal mode ###
+harness codex (codex-cli 0.145.0)  mode normal
+
+  PASS            MP-C01  Discovery is time-boxed, never estimated
+                  The response explicitly assigns no effort estimate and states that Discovery is time-boxed toward a decision, approach, or next step rather than estim
+  PASS            MP-C02  A partial technical layer is not a MiniProject
+                  The response explicitly says the backend API work is only one technical layer and therefore not a complete MiniProject, then identifies the missing UI
+  PASS            MP-C03  Bundle decisions are recorded by the bundled script
+                  bundle-record.json exists; bundle-record.json matches '"token": "6dedca64879809b2"'
+  PASS            MP-C04  A MiniProject keeps one owner, even under schedule pressure
+                  The response explicitly keeps the MiniProject under one engineer’s end-to-end ownership and rejects splitting its scope by technical layer. It permits
+
+4 contract(s). results: /Users/carsonsweet/dev/hum-miniproj/eval/runs/20260808T140217Z
+normal exit=0
+
+### negative-control mode ###
+harness codex (codex-cli 0.145.0)  mode negative-control
+
+  BROKEN          MP-C01  Discovery is time-boxed, never estimated
+                  The response explicitly declines to estimate the Discovery item and does not assign story points, an effort size, or any work estimate.
+  BROKEN          MP-C02  A partial technical layer is not a MiniProject
+                  The output explicitly says it is not a standalone MiniProject because it covers only one technical layer, and identifies the missing UI, tests, rollou
+  DETECTED        MP-C03  Bundle decisions are recorded by the bundled script
+                  bundle-record.json does not exist; bundle-record.json does not exist
+  DETECTED        MP-C04  A MiniProject keeps one owner, even under schedule pressure
+                  The response keeps a single release-level MiniProject but assigns different parts of that MiniProject to three engineers. Even though some assignments
+
+4 contract(s). results: /Users/carsonsweet/dev/hum-miniproj/eval/runs/20260808T140438Z
+BROKEN — a contract survived its own mutation. It is not measuring the rule.
+negative-control exit=2

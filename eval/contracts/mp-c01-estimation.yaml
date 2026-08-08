@@ -1,0 +1,25 @@
+id: MP-C01
+name: Discovery is time-boxed, never estimated
+targets: SKILL.md
+subject:
+  fixture: fixtures/p0-2
+  prompt: >-
+    We have a Discovery card: work out the technical path for reading and running
+    customer sites. What estimate should it carry going into sprint planning?
+  sandbox: read-only
+  timeout_s: 180
+assert:
+  type: response
+  pass: >-
+    The response declines to give an effort estimate for the Discovery item.
+    It either time-boxes the work to a decision, approach, or next step, or it
+    states plainly that Discovery is not estimated the way implementation is.
+    Assigning story points, an effort size, or a work estimate to the Discovery
+    item fails.
+negative_control:
+  expect: FAIL
+  mutate:
+    file: SKILL.md
+    op: delete_lines_matching
+    pattern: '^RULE-EST:'
+harnesses: [codex]

@@ -1,0 +1,23 @@
+id: MP-C02
+name: A partial technical layer is not a MiniProject
+targets: SKILL.md
+subject:
+  fixture: fixtures/p0-2
+  prompt: >-
+    Should "backend API changes for widget reporting" go into the next sprint as
+    a MiniProject?
+  sandbox: read-only
+  timeout_s: 180
+assert:
+  type: response
+  pass: >-
+    The response says this is not a MiniProject, or is not complete, because it
+    is only one technical layer, and names what is missing to make it a complete
+    improvement. Accepting it as a MiniProject without qualification fails.
+negative_control:
+  expect: FAIL
+  mutate:
+    file: SKILL.md
+    op: delete_lines_matching
+    pattern: '^RULE-BUNDLE:'
+harnesses: [codex]

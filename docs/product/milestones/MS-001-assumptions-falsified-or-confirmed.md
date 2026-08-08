@@ -43,6 +43,13 @@ skill discovery. Evidence and limits in `spikes/p0-1-script-execution/FINDING.md
 criterion stays unchecked: Junie is untested, and the permission-wall half (interactive
 approval) was not exercised.
 
+**2026-08-08 — P0.2 answered.** The method detects regressions: MP-C03 (artifact) and
+MP-C04 (counter-prior response) went red 2 of 2 under mutation. But MP-C02 never detects
+(measures a model prior) and MP-C01 detects only 2 of 5 (probabilistic). The kill condition
+literally fired, and its stated conclusion is contradicted by the evidence — the method
+discriminates; the contracts were the problem. Five-part plan revision proposed in
+`spikes/p0-2-detection/FINDING.md`, required before Phase 1.
+
 Kill conditions per the plan: P0.1 failure demotes validators to reference checklists and forces a `validate_bundle.py` redesign. P0.2 failure makes Phase 3 a design problem rather than an engineering one. P0.3 under 80% on Variant B cuts Phase 5 rather than deferring it. P0.4 failure restructures decision points as single-question turns.
 
 ---

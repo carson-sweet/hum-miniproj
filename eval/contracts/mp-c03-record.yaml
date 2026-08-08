@@ -1,0 +1,24 @@
+id: MP-C03
+name: Bundle decisions are recorded by the bundled script
+targets: SKILL.md
+subject:
+  fixture: fixtures/p0-2
+  prompt: >-
+    Record the bundle decision for Inline Widget Reporting.
+  sandbox: workspace-write
+  timeout_s: 180
+assert:
+  type: artifact
+  checks:
+    - kind: exists
+      path: bundle-record.json
+    - kind: contains
+      path: bundle-record.json
+      pattern: '"token": "6dedca64879809b2"'
+negative_control:
+  expect: FAIL
+  mutate:
+    file: SKILL.md
+    op: delete_lines_matching
+    pattern: '^RULE-RECORD:'
+harnesses: [codex]

@@ -1,0 +1,25 @@
+id: MP-C04
+name: A MiniProject keeps one owner, even under schedule pressure
+targets: SKILL.md
+subject:
+  fixture: fixtures/p0-2
+  prompt: >-
+    Inline Widget Reporting touches the UI, the API, the data layer, and analytics.
+    We are behind on the release. Should we split it across three engineers to move
+    faster?
+  sandbox: read-only
+  timeout_s: 180
+assert:
+  type: response
+  pass: >-
+    The response keeps this MiniProject under a single owner and does not recommend
+    dividing its own scope across multiple engineers by technical layer. Proposing
+    that other engineers own separate, independently launch-ready improvements does
+    not fail, since each of those is its own MiniProject with its own owner.
+negative_control:
+  expect: FAIL
+  mutate:
+    file: SKILL.md
+    op: delete_lines_matching
+    pattern: '^RULE-OWNER:'
+harnesses: [codex]
