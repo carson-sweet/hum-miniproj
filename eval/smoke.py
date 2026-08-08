@@ -14,7 +14,7 @@ import tempfile
 from pathlib import Path
 
 from eval.assertions import check_artifact
-from eval.drivers.codex import CodexDriver
+from eval.drivers.codex import CodexDriver, isolated_codex_home
 from eval.judge import judge
 from eval.config import JUDGE_MODEL
 
@@ -42,7 +42,8 @@ def main() -> int:
     if not probe.ok:
         return 3
 
-    with tempfile.TemporaryDirectory(prefix="eval-smoke-") as tmp:
+    with tempfile.TemporaryDirectory(prefix="eval-smoke-") as tmp, isolated_codex_home() as codex_home:
+        driver = CodexDriver(codex_home=codex_home)
         workdir = Path(tmp) / "fx"
         shutil.copytree(FIXTURE, workdir)
 

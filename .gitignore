@@ -6,6 +6,9 @@ venv/
 .DS_Store
 *.egg-info/
 
+# Local credentials — never commit
+.env.local
+
 # Eval run outputs — regenerated, not source
 eval/runs/
 

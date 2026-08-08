@@ -7,13 +7,14 @@ the skill it grades against credits intent instead of behavior.
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
 from eval.cost import parse_usage, record
-from eval.drivers.codex import BIN, ISOLATION_FLAGS
+from eval.drivers.codex import BIN, isolated_codex_home
 
 SCHEMA_PATH = Path(__file__).parent / "schemas" / "verdict.schema.json"
 VALID_VERDICTS = ("PASS", "FAIL")
@@ -95,7 +96,7 @@ def judge(
     model: str,
     timeout_s: int = 120,
 ) -> Verdict:
-    with tempfile.TemporaryDirectory(prefix="eval-judge-") as tmp:
+    with tempfile.TemporaryDirectory(prefix="eval-judge-") as tmp, isolated_codex_home() as codex_home:
         workdir = Path(tmp)
         out_file = workdir / "verdict.json"
         cmd = build_judge_command(
@@ -105,12 +106,15 @@ def judge(
             schema_path=SCHEMA_PATH,
             out_file=out_file,
         )
+        env = os.environ.copy()
+        env["CODEX_HOME"] = str(codex_home)
         proc = subprocess.run(
             cmd,
             capture_output=True,
             text=True,
             timeout=timeout_s,
             stdin=subprocess.DEVNULL,
+            env=env,
         )
         record(role="judge", model=model, usage=parse_usage(proc.stdout), harness="codex")
         if not out_file.exists():

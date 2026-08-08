@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "receipt_type": "completion",
+  "subject_id": "MS-002",
+  "status": "pass",
+  "created_at": "2026-08-08T19:52:32Z",
+  "checks": [
+    {
+      "name": "GitHub PR CI",
+      "status": "pass",
+      "command": "gh run watch 31275468001 --exit-status",
+      "summary": "Editable install, portability lint, and 115 deterministic tests passed on PR #2.",
+      "evidence_path": "https://github.com/carson-sweet/hum-miniproj/actions/runs/31275468001"
+    }
+  ]
+}

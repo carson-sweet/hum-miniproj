@@ -11,7 +11,8 @@ from pathlib import Path
 import pytest
 
 from eval.config import SUBJECT_MODEL
-from eval.drivers.codex import CodexDriver
+from eval.drivers.base import SessionResult
+from eval.drivers.codex import CodexDriver, isolated_codex_home
 
 
 @pytest.fixture
@@ -42,6 +43,41 @@ def test_probe_reports_not_ok_when_binary_missing(driver, monkeypatch):
     result = driver.probe()
     assert not result.ok
     assert "not found" in result.detail.lower()
+
+
+def test_isolated_codex_home_links_auth_and_is_removed(tmp_path):
+    source = tmp_path / "source"
+    source.mkdir()
+    auth = source / "auth.json"
+    auth.write_text("credentials-stay-here")
+
+    with isolated_codex_home(source) as home:
+        saved_home = home
+        assert (home / "auth.json").is_symlink()
+        assert (home / "auth.json").resolve() == auth.resolve()
+        assert (home / "skills").is_dir()
+
+    assert not saved_home.exists()
+
+
+def test_driver_scopes_subprocesses_to_its_codex_home(tmp_path):
+    driver = CodexDriver(codex_home=tmp_path)
+    assert driver.subprocess_env()["CODEX_HOME"] == str(tmp_path)
+
+
+def test_isolated_codex_home_requires_authentication(tmp_path):
+    with pytest.raises(FileNotFoundError, match="auth.json"):
+        with isolated_codex_home(tmp_path):
+            pass
+
+
+def test_session_result_only_completes_with_every_successful_turn(tmp_path):
+    complete = SessionResult("session", [{}, {}, {}], tmp_path, exit_codes=(0, 0, 0))
+    failed = SessionResult("session", [{}, {}, {}], tmp_path, exit_codes=(0, 2, 2))
+    short = SessionResult("session", [{}], tmp_path, exit_codes=(0,))
+    assert complete.completed(3)
+    assert not failed.completed(3)
+    assert not short.completed(3)
 
 
 def test_command_uses_exec_subcommand(driver):
@@ -119,18 +155,18 @@ def test_header_parsing_survives_missing_fields():
 @pytest.mark.integration
 def test_subject_runs_and_writes_an_artifact(tmp_path):
     """End-to-end: a real subject writes a real file into a disposable workdir."""
-    driver = CodexDriver()
     fixture = tmp_path / "fx"
     fixture.mkdir()
     (fixture / "notes.md").write_text("Open question: aggregate or per-segment?\n")
 
-    result = driver.run_subject(
-        fixture=fixture,
-        prompt="Create a file named bundle.md in the working directory containing a '## Owner' heading.",
-        model=SUBJECT_MODEL,
-        writable=True,
-        timeout_s=180,
-    )
+    with isolated_codex_home() as codex_home:
+        result = CodexDriver(codex_home=codex_home).run_subject(
+            fixture=fixture,
+            prompt="Create a file named bundle.md in the working directory containing a '## Owner' heading.",
+            model=SUBJECT_MODEL,
+            writable=True,
+            timeout_s=180,
+        )
 
     assert result.exit_code == 0, result.stdout[-2000:]
     assert (fixture / "bundle.md").exists(), "subject did not produce the artifact"
@@ -158,6 +194,20 @@ def test_events_parsing_survives_malformed_lines():
     assert CodexDriver.parse_events('{not json\n{"type":"thread.started","thread_id":"x"}\n') == "x"
 
 
+def test_diagnostics_keep_tool_failures_but_not_reasoning_or_messages():
+    stream = "\n".join([
+        '{"type":"item.completed","item":{"type":"reasoning","text":"private"}}',
+        '{"type":"item.completed","item":{"type":"agent_message","text":"hello"}}',
+        '{"type":"item.completed","item":{"type":"command_execution","command":"touch x","exit_code":1,"aggregated_output":"read-only"}}',
+        '{"type":"error","message":"sandbox denied"}',
+    ])
+    assert CodexDriver.parse_diagnostics(stream) == [
+        {"type": "command_execution", "command": "touch x", "exit_code": 1,
+         "aggregated_output": "read-only"},
+        {"type": "error", "message": "sandbox denied"},
+    ]
+
+
 def test_command_always_requests_json(driver, tmp_path):
     """--json is not optional: turn.completed carries the usage that meters the call.
 
@@ -173,20 +223,84 @@ def test_command_always_requests_json(driver, tmp_path):
 def test_attribution_survives_json_mode(tmp_path):
     """The regression this path had no coverage for: --json removes the banner,
     so header parsing yields nothing and attribution must come from the events."""
-    driver = CodexDriver()
     fixture = tmp_path / "fx"
     fixture.mkdir()
     events = tmp_path / "events.jsonl"
 
-    result = driver.run_subject(
-        fixture=fixture,
-        prompt="Reply with the single word: ok",
-        model=SUBJECT_MODEL,
-        writable=False,
-        timeout_s=120,
-        events_file=events,
-    )
+    with isolated_codex_home() as codex_home:
+        result = CodexDriver(codex_home=codex_home).run_subject(
+            fixture=fixture,
+            prompt="Reply with the single word: ok",
+            model=SUBJECT_MODEL,
+            writable=False,
+            timeout_s=120,
+            events_file=events,
+        )
 
     assert result.exit_code == 0, result.stdout[-2000:]
     assert result.session_id, "attribution lost in --json mode"
     assert events.exists() and events.read_text().strip(), "event stream not captured"
+
+
+# --- multi-turn support (P0.3). Command construction only; no model calls. ---
+
+def test_persist_drops_ephemeral_so_the_session_can_be_resumed(driver):
+    """--ephemeral and resume are mutually exclusive: no session file, nothing to resume."""
+    assert "--ephemeral" in cmd_for(driver, persist=False)
+    assert "--ephemeral" not in cmd_for(driver, persist=True)
+
+
+def test_multi_turn_requires_an_isolated_codex_home(driver, tmp_path):
+    with pytest.raises(ValueError, match="isolated codex_home"):
+        driver.run_session(fixture=tmp_path, prompts=[], model="m")
+
+
+def test_persist_keeps_every_other_isolation_flag(driver):
+    cmd = cmd_for(driver, persist=True)
+    for flag in ("--ignore-user-config", "--ignore-rules", "--skip-git-repo-check"):
+        assert flag in cmd, f"{flag} must survive persist mode"
+
+
+def test_resume_command_targets_the_session(driver):
+    cmd = driver.build_resume_command(
+        session_id="019fe1", prompt="turn two", model="gpt-5.6-luna",
+        out_file=Path("/tmp/o.txt"), writable=True,
+    )
+    assert cmd[:4] == ["codex", "exec", "resume", "019fe1"]
+    assert cmd[-1] == "turn two"
+
+
+def test_resume_command_still_meters(driver):
+    cmd = driver.build_resume_command(
+        session_id="x", prompt="p", model="m", out_file=Path("/tmp/o"), writable=True,
+    )
+    assert "--json" in cmd, "resumed turns must be metered too"
+
+
+def test_resume_rejects_flags_exec_accepts(driver):
+    """Regression: `codex exec resume` exits 2 on -s/-C/--color.
+
+    Cost a false P0.3 result — turns 2 and 3 failed silently, the register was
+    never written, and the run reported the kill condition as triggered.
+    """
+    cmd = driver.build_resume_command(
+        session_id="x", prompt="p", model="m", out_file=Path("/tmp/o"), writable=True)
+    for flag in ("-s", "-C", "--color"):
+        assert flag not in cmd, f"resume does not accept {flag}"
+
+
+def test_resume_drops_ephemeral_but_keeps_the_rest(driver):
+    cmd = driver.build_resume_command(
+        session_id="x", prompt="p", model="m", out_file=Path("/tmp/o"), writable=True)
+    assert "--ephemeral" not in cmd, "resuming an ephemeral session is impossible"
+    for flag in ("--ignore-user-config", "--ignore-rules", "--skip-git-repo-check"):
+        assert flag in cmd
+
+
+def test_resume_pins_sandbox_through_supported_config_override(driver):
+    writable = driver.build_resume_command(
+        session_id="x", prompt="p", model="m", out_file=Path("/tmp/o"), writable=True)
+    read_only = driver.build_resume_command(
+        session_id="x", prompt="p", model="m", out_file=Path("/tmp/o"), writable=False)
+    assert 'sandbox_mode="workspace-write"' in writable
+    assert 'sandbox_mode="read-only"' in read_only
