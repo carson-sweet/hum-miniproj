@@ -1,0 +1,192 @@
+schema_version: 1
+source:
+  primary: docs/Fewer_Handoffs_Faster_Launches_MiniProject_Model_whimsy_v7 .pdf (June 2026)
+  supporting:
+    - docs/miniproject-model.md
+    - https://www.hum.works/
+    - https://www.hum.works/meet-the-team
+  method: >-
+    Role-based personas derived from the partnership model in the deck, which assigns
+    responsibilities by role. Occupants list the real role-holders at Hum for grounding.
+    These are role archetypes, not psychological profiles of named individuals.
+  provisional: true
+  provisional_reason: >-
+    Built without a discovery.yaml. Triggers, deal-breakers, and failure modes are derived
+    from the deck's stated model rather than from user research. Revise after discovery.
+
+personas:
+  - id: persona-1
+    name: MiniProject Owner
+    role: Software Engineer / Senior Software Engineer
+    occupants: [Andrew Bancroft, Lisa Dina, Esha Datta]
+    context: >-
+      Carries one complete improvement end to end — problem understanding, technical
+      approach, how AI is used, PR sequencing, feedback, testing, QA, and release risk.
+      The deck's central shift: engineers are problem owners, not ticket takers.
+    trigger: >-
+      Tech Refinement hands them a named bundle. Before committing, they have to decide
+      whether it is genuinely complete, demoable, ownable by one person, and launch-ready
+      — or whether it is a technical layer wearing a MiniProject label.
+    deal_breakers:
+      - Adds ceremony without removing coordination — new process on top of the old bill
+      - Only works in one harness; unusable in the editor they actually code in
+      - Grades the quality of their answer instead of checking that an answer exists
+      - Pushes toward giant PRs; the model explicitly keeps PRs small
+    tasks:
+      - id: task-1
+        description: Validate a proposed bundle against the four criteria before committing to own it
+        workflow_steps:
+          - State the problem the bundle solves in one sentence
+          - Answer each of the four criteria — complete, demoable, owned, launch-ready
+          - Run validate_bundle.py against the stated answers
+          - Read the structured findings
+          - Revise, split, or proceed to own it
+        inputs_needed: >-
+          The Discovery output for the parent Project, and the bundle candidate from
+          Tech Refinement.
+        success_criteria:
+          - Validator returns a finding for every criterion that has no stated answer, and none for criteria that do
+          - The engineer reaches revise / split / proceed in under 5 minutes without leaving the editor
+          - Validator runs identically in Claude Code, Codex, and Junie
+        failure_modes:
+          - Engineer answers "yes" to all four without evidence and the validator accepts it
+          - Validator attempts to grade answer quality rather than presence
+          - A partial technical layer passes because the criteria were answered aspirationally
+      - id: task-2
+        description: Split a bundle that is too large for one owner into sequenced MiniProjects
+        workflow_steps:
+          - Identify which criterion fails — usually "owned" or "launch-ready"
+          - Propose a split along complete-improvement lines, not technical layers
+          - Re-validate each resulting bundle independently
+          - Sequence them and note which can launch first
+        inputs_needed: The failing bundle and its validator findings.
+        success_criteria:
+          - Every resulting bundle independently passes all four criteria
+          - At least one resulting bundle is launch-ready without the others shipping
+          - No resulting bundle is a single technical layer
+        failure_modes:
+          - Split reproduces the old frontend/backend/QA seams under new names
+          - Splits are mutually dependent, so none can launch first
+
+  - id: persona-2
+    name: Refinement Facilitator
+    role: Director of Engineering / CTO
+    occupants: [Dylan DiGioia, Niall Little]
+    context: >-
+      Runs Tech Refinement and Tech Estimation. Converts Product's Discovery output into
+      MiniProjects one engineer can own, and decides what still needs Discovery first.
+      Accountable for keeping implementation crumbs in the owner plan, off the board.
+    trigger: >-
+      Product Refinement output lands with Discovery cards. Tech Refinement is next, and
+      the Project cannot enter Sprint Planning until its cards become bundles, Chores, or
+      flagged-for-Discovery.
+    deal_breakers:
+      - Cannot be run live during the existing meeting; a shadow workflow instead of sharper decision points
+      - Pushes full technical breakdowns onto the shared board — the exact ticket cloud the model exists to prevent
+      - Requires every participant to install tooling before the meeting works
+    tasks:
+      - id: task-1
+        description: Run Tech Refinement over a Project's Discovery output
+        workflow_steps:
+          - Review each Discovery card and its useful output
+          - Ask the four questions per candidate — complete and demoable? ownable end to end? testable and launch-ready? needs more Discovery?
+          - Name the resulting MiniProjects and assign one owner each
+          - Flag what needs more Discovery before it can be bundled
+          - Record what stays in the owner plan rather than on the board
+        inputs_needed: Discovery cards with owners and useful outputs from Product Refinement.
+        success_criteria:
+          - Every Discovery card resolves into exactly one of — a named MiniProject with one owner, a Chore, or a needs-more-Discovery flag
+          - Zero cards left unclassified when the meeting ends
+          - Every named MiniProject has exactly one owner, never two
+        failure_modes:
+          - Cards get classified as MiniProjects to clear the meeting, then fail validation later
+          - PR sequence and rollout mechanics leak onto the board instead of the owner plan
+          - A bundle ends with shared ownership because no single person could carry it
+      - id: task-2
+        description: Apply the estimation policy without estimating Discovery like implementation
+        workflow_steps:
+          - Separate items into Chore, Discovery, and MiniProject
+          - Estimate Chores and MiniProjects normally
+          - Time-box Discovery to a decision, approach, or next step
+          - Flag any Discovery item carrying an implementation-style estimate
+        inputs_needed: The classified output of Tech Refinement.
+        success_criteria:
+          - 100% of items leaving Tech Estimation carry the right measure — estimate for Chore and MiniProject, time-box for Discovery
+          - No Discovery item carries a story-point estimate
+        failure_modes:
+          - Discovery gets pointed like implementation, making its variance invisible
+          - A MiniProject is estimated on code alone, excluding tests and release readiness
+
+  - id: persona-3
+    name: Value Definer
+    role: Principal Product Designer / Product
+    occupants: [Chelsea Hitzler]
+    context: >-
+      Defines customer need, priority, urgency, launch goals, and what matters most. Runs
+      Product Prioritization and Product Refinement. Produces Discovery cards specific
+      enough for Engineering to bundle safely — without specifying the bundles.
+    trigger: >-
+      Product Prioritization selects a Project. It is still a broad ask, and Engineering
+      cannot bundle it until the open questions are named and ranked.
+    deal_breakers:
+      - Any model that reduces Product input — the deck lists this explicitly as a non-goal
+      - Being asked to specify technical bundles, sequencing, or release safety
+      - Discovery cards bounced back without a stated reason
+    tasks:
+      - id: task-1
+        description: Turn a broad Project into ranked Discovery cards Engineering can bundle from
+        workflow_steps:
+          - State the Project goal and why it is a Project rather than a Chore
+          - Develop and rank user stories; determine v1 scope
+          - Name each open question as a Discovery card with an owner and a useful output
+          - Invite CSX input for customer examples, urgency, workarounds, and account impact
+        inputs_needed: The prioritized Project and its business goal.
+        success_criteria:
+          - Every Discovery card names both its owner and its useful output
+          - Engineering accepts the full set at Tech Refinement with zero cards returned for re-scoping
+          - v1 scope is stated as an explicit in/out list, not a direction
+        failure_modes:
+          - Cards describe technical tasks instead of decisions to be made
+          - Scope is stated as a direction ("improve onsite optimization") and cannot be bundled
+          - CSX context arrives after Tech Refinement, forcing re-work
+
+  - id: persona-4
+    name: Work Requester
+    role: Customer Success / Account Management / Business Development
+    occupants: [Jake Minturn, Carson Fiori, Heather Trice, John Challice]
+    context: >-
+      Closest to the customer. Requests Projects, Discovery, or Chores, and supplies
+      customer examples, urgency, workarounds, and account impact. Does not create
+      MiniProjects — Engineering does that after the work has shape.
+    trigger: >-
+      A publisher client hits a limitation or asks for something specific. The requester
+      needs it to move, and needs to know quickly whether it is days-fast or needs shaping.
+    deal_breakers:
+      - Every request becoming a Project — the deck names this as an explicit non-goal
+      - Having to learn engineering vocabulary to file a request correctly
+      - Broad asks disappearing silently instead of returning with a named next step
+    tasks:
+      - id: task-1
+        description: File a request so it lands in the right lane
+        workflow_steps:
+          - Describe the customer situation and what specifically is being asked for
+          - Add urgency, current workaround, and account impact
+          - Receive a classification — Chore, Discovery, or Project
+          - For a Chore, watch it enter the fast lane; for broader asks, receive the named shaping step
+        inputs_needed: The customer ask, the account context, and any workaround in use.
+        success_criteria:
+          - A specific bounded ask is classified as a Chore and enters the fast lane without Discovery
+          - A broad ask returns with a named shaping step and its owner, never with silence
+          - Classification is stated within one refinement cycle of filing
+        failure_modes:
+          - A specific ask gets absorbed into a Project and loses its speed advantage
+          - A broad ask is accepted as a Chore, then stalls mid-sprint when its variance surfaces
+          - Requester rewrites the ask to game the classifier rather than describing the real need
+
+anti_profile: >-
+  Teams whose bottleneck is implementation rather than coordination — the model's entire
+  premise is that AI compressed implementation and left coordination untouched, so a team
+  that has not felt that compression gets overhead with no offsetting saving. Also: orgs
+  looking to reduce code review or Product involvement (both are explicit non-goals);
+  teams wanting a replacement issue tracker rather than a bundling discipline; and solo
+  developers with no handoffs, who have no coordination tax to remove.

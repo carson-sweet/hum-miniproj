@@ -1,0 +1,28 @@
+schema_version: 1
+generated_at: '2026-08-08T12:22:02Z'
+project_name: hum-miniproj
+phase_schema_version: 2
+version_stage: IDEA
+deference: guided
+active_work_item:
+  id: null
+  title: null
+  type: null
+  phase: null
+active_milestone: null
+ethos:
+- Propose, don't ask. Give a recommendation with reasoning. Let the user redirect.
+- 'Phase dwelling: never invite advancement. User decides when to move on.'
+- No time estimates. AI speed is not calendar speed.
+- Concrete examples required. Abstract framing is not sufficient input.
+- Challenge before acceptance. One framing question or gap before proceeding.
+- 'Improvement register: apply learnings silently unless directly relevant.'
+improvement_register_count: 0
+improvement_register_summary: []
+checkpoint_next: null
+paths:
+  product_base: docs/product
+  strategy_base: .sweetclaude/strategy
+  technical_base: .sweetclaude/technical
+  design_base: .sweetclaude/design
+  work_base: .sweetclaude/work

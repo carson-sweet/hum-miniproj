@@ -8,3 +8,10 @@ venv/
 
 # Eval run outputs — regenerated, not source
 eval/runs/
+
+# SweetClaude recovery snapshots and manifests
+.sweetclaude/state/recovery-runs/
+
+# SweetClaude regenerable artifacts — rebuilt on demand, not source
+.sweetclaude/cache/
+.sweetclaude/state/doctor-runs/

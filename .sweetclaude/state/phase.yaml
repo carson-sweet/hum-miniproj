@@ -1,0 +1,15 @@
+schema_version: 2
+version_stage: IDEA
+deference_level: guided
+project_type: existing-code
+safety_snapshot: null
+last_work_item_id: null
+active_work_item:
+  id: null
+  type: null
+  workflow: []
+  phase: null
+  title: null
+  started: null
+  entry_category: null
+project_name: hum-miniproj

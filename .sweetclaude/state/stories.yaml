@@ -1,0 +1,17 @@
+format: gherkin
+scope: all
+slc_promise: >-
+  The MiniProject Owner can take any proposed piece of work and know, without leaving
+  their editor, whether it is a real MiniProject — and if not, exactly which criterion
+  is unanswered.
+slc_stories: [US-OWN-001, US-OWN-002, US-OWN-003, US-OWN-004]
+stories:
+  - {id: US-OWN-001, title: Validate a bundle against the four criteria, persona_id: persona-1, epic_id: null, format: gherkin, milestone: MS-003}
+  - {id: US-OWN-002, title: Reject a partial technical layer, persona_id: persona-1, epic_id: null, format: gherkin, milestone: MS-003}
+  - {id: US-OWN-003, title: Split an oversized bundle, persona_id: persona-1, epic_id: null, format: gherkin, milestone: MS-003}
+  - {id: US-OWN-004, title: Run the validator in any supported harness, persona_id: persona-1, epic_id: null, format: gherkin, milestone: MS-002}
+  - {id: US-FAC-001, title: Classify every Discovery card, persona_id: persona-2, epic_id: null, format: gherkin, milestone: MS-003}
+  - {id: US-FAC-002, title: Apply the estimation policy, persona_id: persona-2, epic_id: null, format: gherkin, milestone: MS-003}
+  - {id: US-VAL-001, title: Turn a broad Project into ranked Discovery cards, persona_id: persona-3, epic_id: null, format: gherkin, milestone: null}
+  - {id: US-REQ-001, title: File a request that lands in the right lane, persona_id: persona-4, epic_id: null, format: gherkin, milestone: null}
+current_file: docs/product/hum-miniproj-user-stories-draft-v1.0-20260808.md

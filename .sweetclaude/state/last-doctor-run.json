@@ -1,0 +1,29 @@
+{
+  "timestamp": "20260808T121826Z",
+  "version": "4.5.2",
+  "summary": {
+    "auto_fixed": 2,
+    "user_fixed": 0,
+    "skipped": 0,
+    "failed": 0,
+    "errors": 0,
+    "warnings": 2,
+    "info": 0,
+    "total_findings": 2
+  },
+  "findings": [
+    {
+      "id": "state-integrity:missing:session-state.yaml",
+      "severity": "warning",
+      "summary": "Session state file is missing \u2014 some skills may not work correctly"
+    },
+    {
+      "id": "migration-currency:schema-drift:sweetclaude.yaml",
+      "severity": "warning",
+      "summary": "A state file needs to be upgraded to the current schema"
+    }
+  ],
+  "findings_total": 2,
+  "findings_truncated": 0,
+  "menu_preference": "proceed"
+}

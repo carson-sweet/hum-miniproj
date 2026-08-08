@@ -1,0 +1,20 @@
+hum-miniproj
+════════════════════════════════════
+
+UNFINISHED WORK
+───────────────
+· 5 uncommitted file(s) in working tree
+
+ROADMAP
+───────
+No roadmap configured. Ask me to build one.
+
+EPICS
+─────
+No open epics.
+
+BACKLOG
+───────
+Backlog is clear.
+
+Anything you want to look at more closely, or is there something above you'd like to work on — or something else entirely?

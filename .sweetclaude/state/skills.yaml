@@ -1,0 +1,35 @@
+schema_version: 2
+skills:
+  product-milestones:
+    status: active
+    last_changed_at: '2026-08-08'
+    last_changed_by: onboard
+  project-backlog:
+    status: active
+    last_changed_at: '2026-08-08'
+    last_changed_by: onboard
+  work-item-artifacts:
+    status: active
+    last_changed_at: '2026-08-08'
+    last_changed_by: onboard
+  behavioral-regression:
+    status: active
+    last_changed_at: '2026-08-08'
+    last_changed_by: onboard
+    last_run: null
+    note: Harness available; not yet run. Valid runs need a fresh-context subject
+      and an isolated judge (see docs/behavioral-testing.md). Run after a model upgrade.
+  document-corpus:
+    status: active
+    last_changed_at: '2026-08-08'
+    last_changed_by: onboard
+    note: Structure created; nothing imported. docs/ remains source of truth. Import
+      reference material (research, PDFs, notes) via corpus/raw/inbox/.
+  user-personas:
+    status: active
+    last_changed_at: '2026-08-08'
+    last_changed_by: onboard
+  product-user-stories:
+    status: active
+    last_changed_at: '2026-08-08'
+    last_changed_by: onboard

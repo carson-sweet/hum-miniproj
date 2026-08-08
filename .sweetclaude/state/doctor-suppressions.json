@@ -1,0 +1,7 @@
+[
+  {
+    "finding_id": "structure-anomaly:unexpected-symlink:.sweetclaude/product",
+    "suppressed_at": "20260808T123706Z",
+    "reason": "Intentional bridge: artifact-privacy relocates product base to docs/product, but 6 skills hardcode .sweetclaude/product. Symlink is the pattern doctor.py documents for this case."
+  }
+]
