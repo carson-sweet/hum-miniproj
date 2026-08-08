@@ -19,7 +19,7 @@ Phase 0, the falsification gate. Four load-bearing assumptions each get a spike 
 
 ## Measuring success
 
-- [ ] P0.1 answered with recorded evidence: bundled `scripts/` either do or do not execute under Codex and Junie, sentinel file checked in each harness
+- [x] P0.1 answered with recorded evidence: bundled `scripts/` either do or do not execute under Codex and Junie, sentinel file checked in each harness
 - [ ] P0.2 answered with recorded evidence: three mutated contracts re-run, FAIL expected on all three
 - [ ] P0.3 answered with recorded evidence: capture rate measured over five runs each of Variant A and Variant B, per harness
 - [ ] P0.4 answered with recorded evidence: decision points run as numbered prose in each harness, agent observed to present bounded choices and wait
@@ -39,9 +39,12 @@ _None yet._
 
 **2026-08-08 — P0.1 half-answered.** Codex: bundled scripts execute, symlink install works,
 `agents/openai.yaml` not required, and the eval driver's isolation flags do not suppress
-skill discovery. Evidence and limits in `spikes/p0-1-script-execution/FINDING.md`. The
-criterion stays unchecked: Junie is untested, and the permission-wall half (interactive
-approval) was not exercised.
+skill discovery. Evidence and limits in `spikes/p0-1-script-execution/FINDING.md`.
+
+**2026-08-08 — P0.1 closed.** Junie also executes the bundled script, same model string
+(`gpt-5.6-sol`), sentinel token matched. Kill condition not triggered in either harness.
+Criterion checked. Residual: both harnesses ran permissive approval settings, so the
+"permission wall that breaks flow" half of the assumption is still unexercised.
 
 **2026-08-08 — P0.2 answered.** The method detects regressions: MP-C03 (artifact) and
 MP-C04 (counter-prior response) went red 2 of 2 under mutation. But MP-C02 never detects

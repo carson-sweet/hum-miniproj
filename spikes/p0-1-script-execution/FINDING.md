@@ -1,10 +1,10 @@
 # P0.1 — Do bundled `scripts/` execute under Codex and Junie?
 
-**Version 1.0 — 2026-08-08**
-**Verdict: Codex YES. Junie UNTESTED — P0.1 is half-answered.**
-**Kill condition: not triggered for Codex.**
+**Version 1.1 — 2026-08-08**
+**Verdict: YES under both Codex and Junie. P0.1 is answered.**
+**Kill condition: not triggered.**
 
-Reproduce with `./spikes/p0-1-script-execution/run.sh`. Raw output in `evidence/`.
+Reproduce with `run.sh` (Codex) and `run-junie.sh` (Junie). Raw output in `evidence/`.
 
 ---
 
@@ -64,10 +64,30 @@ Sentinel from variant A:
 }
 ```
 
+### Junie
+
+Junie CLI 26.8.3 (2548.5), same model string as the Codex run — `gpt-5.6-sol`, so the
+comparison isolates the harness rather than confounding it with a model change.
+
+```
+● Read skill  mp-probe
+! Running: python3 ".../skills/mp-probe/scripts/echo_check.py" --out .
+| token=c25f14c61e96593d
+```
+
+Sentinel written, token matched. No approval prompt blocked execution: the account's
+`braveMode` is `AUTO`, which auto-approves terminal commands.
+
+Junie needs no install-and-symlink step. `--skill-location <dir>` accepts any folder of
+skill directories, so the probe ran from a temp dir and touched neither `~/.junie/skills/`
+nor the repo. That is a cleaner isolation story than Codex, which required a canonical copy
+in `~/.agents/skills/` plus a symlink.
+
 ## What this establishes
 
-1. **Bundled scripts execute under Codex.** Validators can be deterministic rather than
-   advisory. `validate_bundle.py` does not need redesigning on Codex's account.
+1. **Bundled scripts execute under both Codex and Junie.** Validators can be deterministic
+   rather than advisory in both harnesses. `validate_bundle.py` needs no redesign, and the
+   kill condition — which fires if either harness fails — is not triggered.
 2. **The symlink install design works.** `script_path` resolved through the symlink to the
    canonical `~/.agents/skills/` copy, so `install.sh` writing one copy and linking it into
    each harness is viable — at least for Codex.
@@ -83,15 +103,17 @@ Sentinel from variant A:
 
 ## What this does NOT establish
 
-**Junie is untested.** P0.1 asks about Codex *and* Junie. Half the question is open, and
-the kill condition triggers on either harness failing. Nothing here licenses a claim about
-portability across harnesses.
+**Claude Code is untested.** P0.1 only asks about Codex and Junie, but the contract format
+claims three harnesses. The third is unverified.
 
-**The permission-wall half is unanswered.** This ran non-interactively with
-`approval: never` and `sandbox: workspace-write` — `codex exec` defaults. The assumption at
-risk includes scripts that "execute behind a permission wall that breaks flow." Interactive
-Codex with default approval settings may prompt before running a bundled script. That is a
-different question and it is untested.
+**The permission-wall half is only half-answered.** Codex ran with `approval: never` and
+`sandbox: workspace-write`; Junie ran with `braveMode: AUTO`. Both are permissive
+configurations. The assumption at risk includes scripts that "execute behind a permission
+wall that breaks flow" — a stricter `braveMode`, or interactive Codex with default approval,
+may prompt before running a bundled script. Neither was exercised.
+
+**Reasoning effort differed.** Codex reported `reasoning effort: none`; Junie is configured
+`{"gpt-5.6-sol":"low"}`. Same model, not quite the same settings.
 
 **One run per variant, one model.** `gpt-5.6-sol`, single-shot. Script execution could be
 probabilistic in a way three runs cannot reveal. No flakiness measurement.
@@ -102,8 +124,8 @@ exists in the Codex-specific manifest that variant A omitted.
 
 ## Follow-on
 
-- Run the same probe under Junie to close P0.1.
-- Add an interactive-approval variant, or document that the model assumes a non-interactive
-  or pre-approved posture.
+- Run the same probe under Claude Code for the third harness.
+- Add a strict-approval variant under both harnesses, or document that the model assumes a
+  pre-approved posture.
 - Repeat each variant N times before treating PASS as stable.
 - Encode finding 3 as a `lint_portable.py` rule: `agents/*.yaml` is harness-specific.
