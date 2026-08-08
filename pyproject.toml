@@ -1,0 +1,15 @@
+[project]
+name = "hum-miniproj-eval"
+version = "0.1.0"
+description = "Behavioral eval harness for the MiniProject skill"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["eval/tests"]
+markers = [
+    "integration: hits the real Codex CLI and costs model calls (deselect with -m 'not integration')",
+]

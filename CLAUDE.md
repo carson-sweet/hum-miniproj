@@ -7,21 +7,28 @@ than by technical layer. Runs anywhere the Agent Skills standard is supported.
 ## Key directories
 
 - `skills/miniproject/` — the portable skill: SKILL.md, references, validators (not yet created)
-- `eval/` — behavioral contract harness with negative controls (not yet created)
+- `eval/` — behavioral contract harness; drivers, judge, assertions
+- `fixtures/` — disposable fixtures copied to temp for each subject run
 - `docs/` — design documents
 
 ## Commands
 
 ```bash
 # Install
-# TODO: no package manifest yet (.gitignore suggests Python + venv)
+python3 -m venv .venv && .venv/bin/pip install -e ".[dev]"
 
-# Test
-# TODO: no test runner configured yet (.gitignore suggests pytest)
+# Test — fast, deterministic, no model calls
+python3 -m pytest -m "not integration"
 
-# Build
-# TODO: add build command
+# Test — hits the real Codex CLI, costs model calls
+python3 -m pytest -m integration
+
+# Prove the harness end to end on the throwaway fixture
+python3 -m eval.smoke
 ```
+
+Integration tests and the smoke run require `codex` on PATH and an authenticated
+Codex session. `python3 -m eval.smoke` exits 0 green, 1 red, 3 on probe failure.
 
 ## Project-specific rules
 
