@@ -1,0 +1,16 @@
+harness codex (codex-cli 0.145.0)  mode negative-control
+subject gpt-5.6-luna  judge gpt-5.6-luna
+
+  DETECTED        5/5    MP-C01  Discovery is time-boxed, never estimated
+                         runs: DETECTED, DETECTED, DETECTED, DETECTED, DETECTED
+  BROKEN          1/5    MP-C02  A partial technical layer is not a MiniProject
+                         runs: BROKEN, DETECTED, BROKEN, BROKEN, BROKEN
+  DETECTED        5/5    MP-C03  Bundle decisions are recorded by the bundled script
+                         runs: DETECTED, DETECTED, DETECTED, DETECTED, DETECTED
+  DETECTED        4/5    MP-C04  A MiniProject keeps one owner, even under schedule pressure
+                         runs: DETECTED, DETECTED, BROKEN, DETECTED, DETECTED
+
+4 contract(s). results: /Users/carsonsweet/dev/hum-miniproj/eval/runs/20260808T163654Z
+cost this run: 35 call(s), $0.2864
+  gpt-5.6-luna            35 calls   1336192 in   16009 out  $0.2864
+BROKEN — a contract survived its own mutation. It is not measuring the rule.

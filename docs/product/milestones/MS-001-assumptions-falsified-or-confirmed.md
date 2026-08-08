@@ -69,6 +69,11 @@ the finding: "waiting" was inferred from turn-end, not observed — headless age
 end the turn. Junie consistently frames the turn as TASK RESULT with the question demoted to
 a note.
 
+**2026-08-08 — P0.2 matrix re-run on gpt-5.6-luna.** 3 of 4 contracts now clear the 4-of-5
+floor (MP-C01 5/5, MP-C03 5/5, MP-C04 4/5 at the floor); MP-C02 remains broken at 1/5 and
+needs replacing. Subject model is a contract-design variable, recorded as plan revision v1.2.
+Full metered cost of the matrix: $0.2864.
+
 Kill conditions per the plan: P0.1 failure demotes validators to reference checklists and forces a `validate_bundle.py` redesign. P0.2 failure makes Phase 3 a design problem rather than an engineering one. P0.3 under 80% on Variant B cuts Phase 5 rather than deferring it. P0.4 failure restructures decision points as single-question turns.
 
 ---

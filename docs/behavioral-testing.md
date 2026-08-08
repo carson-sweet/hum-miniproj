@@ -40,6 +40,12 @@ its mutation 2 times in 5 — a single run would have scored it either way. Run 
 negative control five times; a contract detecting in fewer than 4 is not measuring its
 rule.
 
+**Run contracts against the weakest model that can do the task.** A strong model follows a
+sensible rule from its own priors, which hides whether the instruction is doing any work.
+Measured: MP-C01 detected its mutation 2 of 5 times on `gpt-5.6-sol` and 5 of 5 on
+`gpt-5.6-luna`. The weaker subject is the more sensitive instrument, and it costs 25x less.
+Reserve strong models for contracts where capability is genuinely the variable.
+
 **Run it before trusting a contract, not only after.** A contract whose mutation goes
 undetected is measuring the model's prior rather than the instruction. That is the
 cheapest way to find contracts that look like coverage and are not, and P0.2 found one

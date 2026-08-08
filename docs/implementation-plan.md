@@ -1,6 +1,6 @@
 # Implementation Plan
 
-**Version 1.1 — 2026-08-08**
+**Version 1.2 — 2026-08-08**
 
 Revised after P0.2. See [Plan revisions](#plan-revisions).
 
@@ -333,3 +333,15 @@ above:
    contract both deterministic and 2 of 2 — a file exists or it does not, with no judge
    variance in the loop. This was already rule 3 of the testing approach; it now has
    evidence.
+
+### v1.2 — after the luna re-run (2026-08-08)
+
+6. **Run behavioural contracts against the weakest model that can perform the task.**
+   Re-running the P0.2 matrix on `gpt-5.6-luna` moved MP-C01 from 2 of 5 to 5 of 5, while
+   MP-C02 stayed broken at 1 of 5. A strong subject follows a sensible rule from its own
+   priors, which masks whether the instruction is doing any work — capability makes the
+   instrument *less* sensitive. Reserve strong models for contracts where capability is
+   genuinely the variable. Incidentally 25x cheaper.
+
+   Corollary: MP-C02 fails on both a strong and a weak subject, so it is a bad contract
+   rather than a model artifact, and it must be replaced before the suite is trusted.
