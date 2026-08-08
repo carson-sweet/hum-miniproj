@@ -1,20 +1,22 @@
 ---
+closed_date: '2026-08-08T19:52:38Z'
 created: 2026-08-08
 depends_on: MS-001
 id: MS-002
 owner: Carson Sweet
 sequence: 2
 source: manual
-status: active
+status: done
 target_release: unscheduled
 title: Portable substrate
 type: milestone
-updated: '2026-08-08T19:32:37Z'
+updated: '2026-08-08T19:52:38Z'
 ---
+
 
 # MS-002: Portable substrate
 
-**Version 1.3 — 2026-08-08**
+**Version 1.4 — 2026-08-08**
 
 ## Outcome
 
@@ -25,7 +27,7 @@ The repo scaffold and the enforcement that keeps it portable. `lint_portable.py`
 - [x] `lint_portable.py` passes on the scaffold
 - [x] `lint_portable.py` fails on a deliberately planted violation
 - [x] `install.sh` verified in all three harnesses; the skill appears in each harness's skill listing
-- [ ] `lint_portable.py` runs in CI on every PR
+- [x] `lint_portable.py` runs in CI on every PR
 
 ## Non-goals
 
@@ -66,8 +68,14 @@ four probe invocations created four mode-600 `.claude.json.backup.*` files in th
 
 Those exact files were left untouched; no sweep or cleanup was attempted. No file under the real
 Claude home contained the throwaway project path. Future automated Claude runs need a stronger
-outer-home isolation boundary before they are considered safe. The CI workflow remains unchecked
-until it runs on an actual pull request.
+outer-home isolation boundary before they are considered safe.
+
+**2026-08-08 — pull-request CI verified.** The first PR run correctly failed before tests because
+setuptools discovered unrelated top-level directories as packages. The failure was reproduced in
+a clean virtual environment, a regression test was added first, and package discovery was bounded
+to `eval*`. A fresh editable install then succeeded locally. GitHub Actions run
+`31275468001` passed the editable install, portability lint, and all 115 deterministic tests.
+All four milestone criteria are met.
 
 ---
 
@@ -75,6 +83,7 @@ until it runs on an actual pull request.
 
 | Version | Date       | Change summary                                          |
 |---------|------------|---------------------------------------------------------|
+| 1.4     | 2026-08-08 | Verified PR CI and marked all criteria complete.        |
 | 1.3     | 2026-08-08 | Verified Claude discovery; recorded isolation residual. |
 | 1.2     | 2026-08-08 | Started TDD implementation; recorded live probe limits. |
 | 1.1     | 2026-08-08 | Added YAML frontmatter; status to canonical vocabulary. |
