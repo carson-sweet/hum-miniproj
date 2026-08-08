@@ -1,20 +1,22 @@
 ---
+closed_date: '2026-08-08T21:13:31Z'
 created: 2026-08-08
 depends_on: MS-002
 id: MS-003
 owner: Carson Sweet
 sequence: 3
 source: manual
-status: active
+status: done
 target_release: unscheduled
 title: MiniProject skill
 type: milestone
-updated: '2026-08-08T20:01:03Z'
+updated: '2026-08-08T21:13:31Z'
 ---
+
 
 # MS-003: MiniProject skill
 
-**Version 1.3 — 2026-08-08**
+**Version 1.4 — 2026-08-08**
 
 ## Outcome
 
@@ -22,7 +24,7 @@ The skill itself — `SKILL.md`, the four reference documents, and `validate_bun
 
 ## Measuring success
 
-- [ ] Skill activates on a realistic prompt in all three harnesses
+- [x] Skill activates on a realistic prompt in all three harnesses
 - [x] `validate_bundle.py` rejects a partial-technical-layer bundle
 - [x] `validate_bundle.py` accepts a complete-improvement bundle
 - [x] The Chore fast lane observably bypasses bundling
@@ -58,8 +60,15 @@ Codex and Junie automatically activated the current skill on a realistic typo-fi
 prompt. Codex selected the Chore fast lane and skipped bundle validation. Junie's trace loaded
 the skill and work-types reference but emitted an empty final result. Claude discovered an
 earlier description but did not invoke it automatically, and a stronger-isolation rerun changed
-real Claude state despite an OS write sandbox. The all-harness criterion remains open. Evidence,
-exact paths, and the no-rerun safety boundary are in `spikes/ms-003-activation/FINDING.md`.
+real Claude state despite an OS write sandbox. At that point the all-harness criterion remained
+open. Evidence, exact paths, and the resulting container boundary are in
+`spikes/ms-003-activation/FINDING.md`.
+
+**2026-08-08 — Claude activation verified in a disposable container.** Claude Code 2.1.226
+ran in a Linux container with no host Claude-state mount, the skill mounted read-only, and
+session persistence disabled. Its trace automatically dispatched `miniproject`; its response
+classified the request as a Chore, selected the fast lane, and skipped Discovery and bundle
+validation. The debug log contained no OAuth token. All five milestone criteria are met.
 
 ---
 
@@ -67,6 +76,7 @@ exact paths, and the no-rerun safety boundary are in `spikes/ms-003-activation/F
 
 | Version | Date       | Change summary                                          |
 |---------|------------|---------------------------------------------------------|
+| 1.4     | 2026-08-08 | Verified isolated Claude activation; all criteria met.  |
 | 1.3     | 2026-08-08 | Implemented the skill; recorded activation evidence.    |
 | 1.2     | 2026-08-08 | Recorded the approved Discovery model and rationale.    |
 | 1.1     | 2026-08-08 | Added YAML frontmatter; status to canonical vocabulary. |

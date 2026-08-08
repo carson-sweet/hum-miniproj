@@ -1,7 +1,7 @@
 # MS-003 activation and Chore routing
 
-**Version 1.0 — 2026-08-08**
-**Status: Codex and Junie activate; Claude automatic invocation is unproven.**
+**Version 1.1 — 2026-08-08**
+**Status: automatic activation verified in Codex, Junie, and Claude.**
 
 ## Prompt
 
@@ -18,7 +18,7 @@ from the frontmatter description rather than explicit invocation.
 |---|---|---|
 | Codex | yes | Classified Chore, selected the Chore fast lane, and explicitly skipped Discovery and bundle validation |
 | Junie | yes | Trace read `miniproject` and `references/work-types.md`; CLI emitted an empty `TASK RESULT`, so response behavior was not scored |
-| Claude | not safely rerun | Earlier trace discovered the skill but did not invoke it; response used a generic Bug classification |
+| Claude | yes | Dispatched the `miniproject` skill, classified Chore, selected the fast lane, and explicitly skipped Discovery and bundle validation |
 
 Codex and Junie ran from temporary harness homes with the current skill after its
 trigger description was strengthened. Both exited 0. The Codex response supplies
@@ -32,13 +32,14 @@ did not load it. It answered from model priors and called the request a Bug. The
 frontmatter description was revised to put the classification use case first and
 name board planning, bugs, typos, and one-line fixes explicitly. A deterministic
 test protects those trigger terms. Codex and Junie activated with the revised
-description; Claude has not been rerun because its state isolation failed.
+description. Claude then activated in a disposable Linux container with no host
+Claude-state mount.
 
 Claude's documented behavior is to match the task against the skill description
 for automatic invocation. Explicit `/miniproject` invocation is therefore not a
 substitute for this criterion.
 
-## Claude isolation failure
+## Claude isolation boundary
 
 The probe used a temporary `CLAUDE_CONFIG_DIR`, a token held only in process
 memory, no session persistence, and an OS sandbox that denied writes to both
@@ -57,13 +58,25 @@ was attempted. Because other Claude processes may have been active, causality fo
 the config-content change cannot be proven from timestamps alone; the boundary is
 still unsafe because the observed state changed during the probe.
 
-Do not run further automated Claude subjects until execution is isolated outside
-the user's OS-level Claude state, such as a disposable user or container. A process
-sandbox around the Claude CLI is insufficient if Claude delegates state maintenance
-to an already-running process.
+The successful rerun used a disposable Linux container built with Claude Code
+2.1.226. The container received only the OAuth token as a process environment
+variable and a read-only mount of `skills/miniproject/`; it had no mount of the
+host's `~/.claude/` or `~/.claude.json`. Session persistence was disabled. The
+container was removed automatically after the run, and its debug log did not
+contain the OAuth token.
+
+The trace reported `SkillTool returning 3 newMessages for skill miniproject`.
+Claude's final response identified the request as a Chore, instructed use of the
+Chore fast lane, and explicitly skipped bundle validation and Discovery. The run
+exited 0.
+
+Retain this container boundary for future automated Claude subjects. A process
+sandbox around a host Claude CLI remains insufficient if Claude delegates state
+maintenance to an already-running host process.
 
 ## Decision
 
-Keep the all-three-harness activation criterion open. Codex and Junie evidence is
-valid. Claude's earlier explicit invocation proves installation and direct loading,
-but not automatic activation of the current skill on a realistic prompt.
+The all-three-harness activation criterion passes. Codex, Junie, and Claude each
+automatically loaded the current skill from the same realistic prompt. Codex and
+Claude also produced the expected Chore fast-lane behavior; Junie's activation is
+trace-proven but its CLI emitted no final result.
