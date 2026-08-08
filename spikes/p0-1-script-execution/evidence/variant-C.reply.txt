@@ -1,0 +1,1 @@
+The script printed token: `c25f14c61e96593d`

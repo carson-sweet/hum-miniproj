@@ -1,0 +1,10 @@
+{
+  "marker": "MP-P0.1-SENTINEL",
+  "token": "c25f14c61e96593d",
+  "python_version": "3.11.6",
+  "executable": "/Users/carsonsweet/.pyenv/versions/3.11.6/bin/python3",
+  "pid": 53683,
+  "cwd": "/private/var/folders/_3/l2mcg5cd33s8bq9yfth49y8h0000gn/T/tmp.FhBthA1Bbq",
+  "script_path": "/Users/carsonsweet/.agents/skills/mp-probe/scripts/echo_check.py",
+  "wrote_at": "2026-08-08T13:33:13Z"
+}

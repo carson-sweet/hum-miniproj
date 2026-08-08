@@ -37,6 +37,12 @@ _None yet._
 
 ## Notes
 
+**2026-08-08 — P0.1 half-answered.** Codex: bundled scripts execute, symlink install works,
+`agents/openai.yaml` not required, and the eval driver's isolation flags do not suppress
+skill discovery. Evidence and limits in `spikes/p0-1-script-execution/FINDING.md`. The
+criterion stays unchecked: Junie is untested, and the permission-wall half (interactive
+approval) was not exercised.
+
 Kill conditions per the plan: P0.1 failure demotes validators to reference checklists and forces a `validate_bundle.py` redesign. P0.2 failure makes Phase 3 a design problem rather than an engineering one. P0.3 under 80% on Variant B cuts Phase 5 rather than deferring it. P0.4 failure restructures decision points as single-question turns.
 
 ---
