@@ -108,3 +108,35 @@ def test_missing_target_file_is_inert_not_crash(skill_dir):
     )
     assert not result.applied
     assert "does not exist" in result.detail
+
+
+# --- verdict aggregation across repeated runs (pure, no model calls) ---
+
+from eval.run_contracts import classify  # noqa: E402
+
+
+def test_negative_control_needs_the_floor_to_count_as_detecting():
+    assert classify(["DETECTED"] * 4 + ["BROKEN"], negative=True) == ("DETECTED", "4/5")
+
+
+def test_negative_control_below_floor_is_broken():
+    assert classify(["DETECTED"] * 3 + ["BROKEN"] * 2, negative=True) == ("BROKEN", "3/5")
+
+
+def test_mp_c01_actual_result_scores_broken():
+    """The real MP-C01 sequence from the P0.2 spike: 2 of 5."""
+    v = ["DETECTED", "BROKEN", "BROKEN", "BROKEN", "DETECTED"]
+    assert classify(v, negative=True) == ("BROKEN", "2/5")
+
+
+def test_normal_mode_requires_every_run_to_pass():
+    assert classify(["PASS", "PASS"], negative=False) == ("PASS", "2/2")
+    assert classify(["PASS", "FAIL"], negative=False) == ("FAIL", "1/2")
+
+
+def test_any_inert_mutation_poisons_the_whole_result():
+    assert classify(["DETECTED", "MUTATION-INERT"], negative=True)[0] == "MUTATION-INERT"
+
+
+def test_no_runs_is_not_a_silent_pass():
+    assert classify([], negative=True)[0] == "NO-RUNS"

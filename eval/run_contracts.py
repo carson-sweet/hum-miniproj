@@ -41,6 +41,24 @@ HARNESS_SKILL_ROOT = {"codex": Path.home() / ".codex" / "skills"}
 DRIVERS = {"codex": CodexDriver}
 
 
+DETECTION_FLOOR = 0.8  # 4 of 5, per the v1.1 plan revision
+
+
+def classify(verdicts: list[str], negative: bool, floor: float = DETECTION_FLOOR) -> tuple[str, str]:
+    """Collapse repeated runs into one verdict plus a rate. Pure, so it is testable."""
+    n = len(verdicts)
+    if not n:
+        return "NO-RUNS", "0/0"
+    if "MUTATION-INERT" in verdicts:
+        return "MUTATION-INERT", f"{verdicts.count('MUTATION-INERT')}/{n} inert"
+    good = "DETECTED" if negative else "PASS"
+    hits = verdicts.count(good)
+    rate = f"{hits}/{n}"
+    if negative:
+        return ("DETECTED" if hits / n >= floor else "BROKEN"), rate
+    return ("PASS" if hits == n else "FAIL"), rate
+
+
 @dataclass
 class Outcome:
     contract: str
@@ -52,6 +70,8 @@ class Outcome:
     session_id: str | None = None
     duration_s: float = 0.0
     checks: list = field(default_factory=list)
+    rate: str = ""
+    runs: list = field(default_factory=list)
 
 
 def load_contracts(only: str | None) -> list[dict]:
@@ -149,6 +169,8 @@ def main() -> int:
     ap.add_argument("--harness", default="codex", choices=sorted(DRIVERS))
     ap.add_argument("--negative-control", action="store_true")
     ap.add_argument("--keep-workdirs", action="store_true")
+    ap.add_argument("--repeat", type=int, default=1,
+                    help="runs per contract; negative controls need 5 to score a rate")
     args = ap.parse_args()
 
     driver = DRIVERS[args.harness]()
@@ -166,13 +188,22 @@ def main() -> int:
         print("no contracts matched")
         return 3
 
+    if args.negative_control and args.repeat < 5:
+        print(f"note: --repeat {args.repeat}; the plan asks for 5 to score a detection rate.\n")
+
     outcomes = []
     for c in contracts:
-        o = run_one(c, args.harness, args.negative_control, args.keep_workdirs)
+        runs = [run_one(c, args.harness, args.negative_control, args.keep_workdirs)
+                for _ in range(args.repeat)]
+        verdict, rate = classify([r.verdict for r in runs], args.negative_control)
+        last = runs[-1]
+        o = Outcome(c["id"], args.harness, last.mode, verdict, last.reason, last.model,
+                    last.session_id, last.duration_s, last.checks, rate,
+                    [r.verdict for r in runs])
         outcomes.append(o)
-        print(f"  {o.verdict:<15} {o.contract}  {c['name']}")
-        if o.reason:
-            print(f"                  {o.reason[:150]}")
+        print(f"  {o.verdict:<15} {o.rate:<6} {o.contract}  {c['name']}")
+        if args.repeat > 1:
+            print(f"                         runs: {', '.join(o.runs)}")
 
     stamp = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
     run_dir = RUNS_DIR / stamp
