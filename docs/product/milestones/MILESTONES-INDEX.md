@@ -1,13 +1,13 @@
 # Milestones Index
 
-**Version 1.1 — 2026-08-08**
+**Version 1.2 — 2026-08-08**
 
 Roadmap targets for hum-miniproj. One row per milestone; the milestone files are
 the source of truth. Progress is recomputed on every read.
 
 | ID | Title | Status | Sequence | Depends on | Criteria met |
 |----|-------|--------|----------|------------|--------------|
-| MS-001 | Assumptions falsified or confirmed | active   | 1 | ~ | 0/5 |
+| MS-001 | Assumptions falsified or confirmed | done     | 1 | ~ | 5/5 |
 | MS-002 | Portable substrate | new      | 2 | MS-001 | 0/4 |
 | MS-003 | MiniProject skill | new      | 3 | MS-002 | 0/5 |
 | MS-004 | Behavioral eval harness | new      | 4 | MS-003 | 0/4 |
