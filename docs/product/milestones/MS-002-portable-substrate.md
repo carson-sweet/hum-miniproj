@@ -14,7 +14,7 @@ updated: '2026-08-08T19:32:37Z'
 
 # MS-002: Portable substrate
 
-**Version 1.2 — 2026-08-08**
+**Version 1.3 — 2026-08-08**
 
 ## Outcome
 
@@ -24,7 +24,7 @@ The repo scaffold and the enforcement that keeps it portable. `lint_portable.py`
 
 - [x] `lint_portable.py` passes on the scaffold
 - [x] `lint_portable.py` fails on a deliberately planted violation
-- [ ] `install.sh` verified in all three harnesses; the skill appears in each harness's skill listing
+- [x] `install.sh` verified in all three harnesses; the skill appears in each harness's skill listing
 - [ ] `lint_portable.py` runs in CI on every PR
 
 ## Non-goals
@@ -48,12 +48,26 @@ installer tests cover the canonical copy, all three harness links, repeat instal
 reversible uninstall, and refusal to overwrite unowned paths. The deterministic suite is
 green at 114 passed with four live integrations deselected.
 
-Live discovery from a throwaway install succeeded under Codex and Junie: each harness opened
-the linked `SKILL.md` from its own temporary default skill directory. Claude discovery remains
-unverified because its existing login was unavailable under an isolated `CLAUDE_CONFIG_DIR`;
-two credential-isolation approaches both failed closed with `Not logged in`. No probe wrote to
-the real harness homes. The CI workflow is present locally but remains unchecked until it runs
-on an actual pull request.
+Live discovery from a throwaway install succeeded under Codex, Junie, and Claude: each harness
+opened the linked `SKILL.md` from its own temporary default skill directory. Claude used a
+`CLAUDE_CODE_OAUTH_TOKEN` loaded from the mode-600 `.env.local`, an isolated
+`CLAUDE_CONFIG_DIR`, no session persistence, and a read-only tool surface. It returned the exact
+frontmatter description from the installed skill. The token was absent from every file in the
+throwaway tree.
+
+**Claude isolation residual:** `CLAUDE_CONFIG_DIR` does not fully redirect Claude's state. The
+four probe invocations created four mode-600 `.claude.json.backup.*` files in the real
+`~/.claude/backups/`, one at each invocation timestamp:
+
+- `.claude.json.backup.1786217922892`
+- `.claude.json.backup.1786218058265`
+- `.claude.json.backup.1786218159059`
+- `.claude.json.backup.1786218274685`
+
+Those exact files were left untouched; no sweep or cleanup was attempted. No file under the real
+Claude home contained the throwaway project path. Future automated Claude runs need a stronger
+outer-home isolation boundary before they are considered safe. The CI workflow remains unchecked
+until it runs on an actual pull request.
 
 ---
 
@@ -61,6 +75,7 @@ on an actual pull request.
 
 | Version | Date       | Change summary                                          |
 |---------|------------|---------------------------------------------------------|
+| 1.3     | 2026-08-08 | Verified Claude discovery; recorded isolation residual. |
 | 1.2     | 2026-08-08 | Started TDD implementation; recorded live probe limits. |
 | 1.1     | 2026-08-08 | Added YAML frontmatter; status to canonical vocabulary. |
 | 1.0     | 2026-08-08 | Imported from `docs/implementation-plan.md` v1.0 (MP-2). |
