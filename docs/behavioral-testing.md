@@ -1,6 +1,6 @@
 # Behavioral Testing Approach
 
-**Version 1.0 — 2026-08-08**
+**Version 1.1 — 2026-08-08**
 
 How a skill made of instructions gets tested. Companion to the
 [implementation plan](implementation-plan.md).
@@ -34,6 +34,16 @@ measuring something that cannot fail, or measuring nothing at all.
 So each contract declares how to break the skill, and the harness can run in a mode
 that applies every declared mutation and confirms each contract goes red. **A
 contract that survives its own mutation is reported as broken, not as passing.**
+
+**Detection is measured as a rate, not a verdict.** P0.2 found a contract that detected
+its mutation 2 times in 5 — a single run would have scored it either way. Run the
+negative control five times; a contract detecting in fewer than 4 is not measuring its
+rule.
+
+**Run it before trusting a contract, not only after.** A contract whose mutation goes
+undetected is measuring the model's prior rather than the instruction. That is the
+cheapest way to find contracts that look like coverage and are not, and P0.2 found one
+in four.
 
 This is the single rule most likely to prevent the failure this approach was
 designed against: a green suite sitting next to a feature that does not work.

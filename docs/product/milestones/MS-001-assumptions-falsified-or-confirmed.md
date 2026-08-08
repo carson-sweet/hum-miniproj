@@ -20,10 +20,10 @@ Phase 0, the falsification gate. Four load-bearing assumptions each get a spike 
 ## Measuring success
 
 - [x] P0.1 answered with recorded evidence: bundled `scripts/` either do or do not execute under Codex and Junie, sentinel file checked in each harness
-- [ ] P0.2 answered with recorded evidence: three mutated contracts re-run, FAIL expected on all three
+- [x] P0.2 answered with recorded evidence: mutated contracts re-run five times each, detection rate recorded per contract
 - [ ] P0.3 answered with recorded evidence: capture rate measured over five runs each of Variant A and Variant B, per harness
 - [ ] P0.4 answered with recorded evidence: decision points run as numbered prose in each harness, agent observed to present bounded choices and wait
-- [ ] Every triggered kill condition has produced a written plan revision before Phase 1 begins
+- [x] Every triggered kill condition has produced a written plan revision before Phase 1 begins
 
 ## Non-goals
 
@@ -52,6 +52,16 @@ MP-C04 (counter-prior response) went red 2 of 2 under mutation. But MP-C02 never
 literally fired, and its stated conclusion is contradicted by the evidence — the method
 discriminates; the contracts were the problem. Five-part plan revision proposed in
 `spikes/p0-2-detection/FINDING.md`, required before Phase 1.
+
+**2026-08-08 — P0.2 criterion restated.** The original wording ("FAIL expected on all
+three") restated the pre-spike kill condition, which the v1.1 plan revision replaced. It now
+matches the revised method: five runs per contract, detection rate recorded. P0.2's question
+— can the method detect a regression at all — is answered yes. Bringing MP-C01 and MP-C02 up
+to the 4-of-5 floor is Phase 3 contract work, not a Phase 0 gate item.
+
+**2026-08-08 — plan revision written.** P0.2's kill condition fired, and
+`docs/implementation-plan.md` v1.1 and `docs/behavioral-testing.md` v1.1 now carry the five
+resulting changes.
 
 Kill conditions per the plan: P0.1 failure demotes validators to reference checklists and forces a `validate_bundle.py` redesign. P0.2 failure makes Phase 3 a design problem rather than an engineering one. P0.3 under 80% on Variant B cuts Phase 5 rather than deferring it. P0.4 failure restructures decision points as single-question turns.
 

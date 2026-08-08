@@ -1,6 +1,8 @@
 # Implementation Plan
 
-**Version 1.0 — 2026-08-08**
+**Version 1.1 — 2026-08-08**
+
+Revised after P0.2. See [Plan revisions](#plan-revisions).
 
 Phased plan for building the MiniProject skill and its behavioral eval harness.
 Companion documents: [MiniProject operating model](miniproject-model.md),
@@ -57,11 +59,15 @@ sound base. Its sensitivity is unmeasured — a suite that has only ever returne
 green has not demonstrated it can return red.
 
 **Method:** take three contracts covering distinct behavior classes. For each,
-delete the governing rule from the instruction set given to the subject. Re-run.
-Expect FAIL on all three.
+delete the governing rule from the instruction set given to the subject. Re-run
+**five times** and record a detection rate. A single run cannot distinguish a
+load-bearing rule from a lucky sample.
 
-**Kill condition:** any mutation still returns PASS → the method does not
-discriminate, and Phase 3 becomes a design problem rather than an engineering one.
+**Kill condition (revised after the spike):** *no* contract detects its mutation →
+the method does not discriminate, and Phase 3 becomes a design problem rather than an
+engineering one. A *specific* contract failing to detect is a contract fault, not a
+method fault: it means that contract measures the model's prior rather than the rule,
+and it must be redesigned or dropped.
 
 ### P0.3 — Can register capture be made reliable without a hook?
 
@@ -162,8 +168,10 @@ The trust anchor. Built to a higher standard than the rest. Design detail in
 
 **Exit criteria**
 
-- Every contract has a negative control, and `--negative-control` reports 100%
-  detection.
+- Every contract has a negative control, and every contract detects its own mutation
+  in at least 4 of 5 runs. Contracts below that floor are redesigned or dropped before
+  the suite is trusted.
+- Every contract's criterion is no broader than the rule it tests, checked by review.
 - Full matrix runs across three harnesses with per-harness results recorded.
 - At least one contract asserts on an artifact rather than on response text.
 
@@ -294,7 +302,34 @@ moves to moderate.
 
 - **P0.1 fails** — validators become prose; enforcement is advisory in every harness
   and the value proposition weakens materially.
-- **P0.2 fails** — the behavioral method is not portable; Phase 3 becomes research.
-  This is the spike most likely to surprise, given how consistently green the
-  precedent has been.
+- **P0.2 fails** — meaning no contract detects its mutation. The behavioral method is
+  not portable and Phase 3 becomes research. Partial detection is not this failure; it
+  is a contract-selection problem, and the spike showed it is the common case.
 - **P0.3 under threshold** — Phase 5 is cut rather than deferred.
+
+---
+
+## Plan revisions
+
+### v1.1 — after P0.2 (2026-08-08)
+
+P0.2 ran four contracts. Two detected their mutation every time, one never did, and one
+detected 2 of 5. Evidence in `spikes/p0-2-detection/FINDING.md`. Five changes, all made
+above:
+
+1. **P0.2's kill condition was wrong.** It read "any mutation still returns PASS → the
+   method does not discriminate." One mutation did return PASS while the method plainly
+   discriminated elsewhere. Rewritten to fire only when *no* contract detects.
+2. **Negative controls run five times and report a rate.** MP-C01 detected 2 of 5. A
+   single run would have called it green or red depending on which run you took.
+3. **The negative control is a contract-selection screen**, not only a validation step.
+   Run it before trusting a contract; one whose mutation goes undetected is measuring a
+   model prior. MP-C02 rejected a backend-only slice as incomplete with its rule deleted,
+   because the model already holds that judgment.
+4. **A contract's criterion must be no broader than the rule it tests.** MP-C04's first
+   criterion was broader than its rule, and the judge correctly failed a compliant
+   response. The judge enforces what is written.
+5. **Artifact assertions are preferred where an outcome is claimed.** MP-C03 was the only
+   contract both deterministic and 2 of 2 — a file exists or it does not, with no judge
+   variance in the loop. This was already rule 3 of the testing approach; it now has
+   evidence.
