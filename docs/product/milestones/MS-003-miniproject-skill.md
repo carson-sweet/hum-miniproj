@@ -1,18 +1,20 @@
 ---
+created: 2026-08-08
+depends_on: MS-002
 id: MS-003
+owner: Carson Sweet
+sequence: 3
+source: manual
+status: active
+target_release: unscheduled
 title: MiniProject skill
 type: milestone
-status: new
-created: 2026-08-08
-target_release: unscheduled
-sequence: 3
-owner: Carson Sweet
-depends_on: MS-002
-source: manual
+updated: '2026-08-08T20:01:03Z'
 ---
+
 # MS-003: MiniProject skill
 
-**Version 1.1 — 2026-08-08**
+**Version 1.3 — 2026-08-08**
 
 ## Outcome
 
@@ -21,10 +23,10 @@ The skill itself — `SKILL.md`, the four reference documents, and `validate_bun
 ## Measuring success
 
 - [ ] Skill activates on a realistic prompt in all three harnesses
-- [ ] `validate_bundle.py` rejects a partial-technical-layer bundle
-- [ ] `validate_bundle.py` accepts a complete-improvement bundle
-- [ ] The Chore fast lane observably bypasses bundling
-- [ ] How Discovery is modeled is decided and recorded with written rationale
+- [x] `validate_bundle.py` rejects a partial-technical-layer bundle
+- [x] `validate_bundle.py` accepts a complete-improvement bundle
+- [x] The Chore fast lane observably bypasses bundling
+- [x] How Discovery is modeled is decided and recorded with written rationale
 
 ## Non-goals
 
@@ -34,11 +36,30 @@ The skill itself — `SKILL.md`, the four reference documents, and `validate_bun
 
 ## Contributing work items
 
-_None yet._
+- [#3 — Build the MiniProject skill](https://github.com/carson-sweet/hum-miniproj/issues/3)
 
 ## Notes
 
 The Discovery modeling decision is called out in the plan as the open question to resolve in this phase, and it carries a written-rationale requirement. See the open questions in `docs/miniproject-model.md`.
+
+**2026-08-08 — Discovery model decided.** Discovery is a first-class, time-boxed work item
+with a required decision artifact and exactly three terminal outcomes: ready to shape, more
+Discovery required, or stop. It is not estimated like implementation and does not use a
+shipped-code lifecycle. The rationale is recorded in `docs/miniproject-model.md`.
+
+**2026-08-08 — skill and validator implemented tests-first.** The package contains the planned
+four references and deterministic validator. Focused tests went red before each implementation
+slice and now cover partial rejection, complete acceptance, presence-not-grading, blank answers,
+Chore bypass, CLI exit behavior, package structure, and trigger terms. The full deterministic
+suite passes 128 tests with four live integrations deselected; portability lint and the standard
+skill validator both pass.
+
+Codex and Junie automatically activated the current skill on a realistic typo-fix planning
+prompt. Codex selected the Chore fast lane and skipped bundle validation. Junie's trace loaded
+the skill and work-types reference but emitted an empty final result. Claude discovered an
+earlier description but did not invoke it automatically, and a stronger-isolation rerun changed
+real Claude state despite an OS write sandbox. The all-harness criterion remains open. Evidence,
+exact paths, and the no-rerun safety boundary are in `spikes/ms-003-activation/FINDING.md`.
 
 ---
 
@@ -46,5 +67,7 @@ The Discovery modeling decision is called out in the plan as the open question t
 
 | Version | Date       | Change summary                                          |
 |---------|------------|---------------------------------------------------------|
+| 1.3     | 2026-08-08 | Implemented the skill; recorded activation evidence.    |
+| 1.2     | 2026-08-08 | Recorded the approved Discovery model and rationale.    |
 | 1.1     | 2026-08-08 | Added YAML frontmatter; status to canonical vocabulary. |
 | 1.0     | 2026-08-08 | Imported from `docs/implementation-plan.md` v1.0 (MP-3). |

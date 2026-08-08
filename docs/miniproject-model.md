@@ -193,14 +193,30 @@ by design.
 
 ---
 
-## Open modeling questions
+## Modeling decisions and open questions
 
-Carried into implementation, not resolved here.
+### Discovery — decided 2026-08-08
 
-**How is Discovery modeled?** Every phase sequence in conventional tooling
-terminates in shipped code. Discovery's correct output is a decision, approach, or
-next step. Whether it gets its own phase sequence ending in a decision artifact, or
-is modeled as an unestimated container with a required output type, is unresolved.
+Discovery is a first-class, time-boxed work item with a required decision
+artifact. It is never estimated like implementation and does not use a phase
+sequence that implies shipped code. It terminates in exactly one of three
+outcomes:
+
+1. ready to shape as a MiniProject or Chore;
+2. more Discovery required, with the next question made explicit; or
+3. stop, with the reason recorded.
+
+The required fields are the question being answered, owner, time box, decision
+artifact, and terminal outcome.
+
+**Rationale.** Discovery produces reduced uncertainty, not a release. A delivery
+lifecycle would create false progress semantics, while an unstructured container
+would make completion subjective and invite indefinite research. The time box
+controls investment, the artifact makes the result observable, and the three
+terminal outcomes force a concrete next step without pretending the work shipped
+product behavior.
+
+### Open questions
 
 **Where is the MiniProject/Chore boundary enforced?** The distinction is judgment —
 "complete and demoable" versus "small, specific, low variance." Encoding judgment as
