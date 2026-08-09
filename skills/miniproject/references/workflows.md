@@ -6,7 +6,9 @@ findings. Exit 2 means the input itself is invalid.
 
 ## Validate one MiniProject
 
-Run `scripts/validate_bundle.py BUNDLE.json`.
+For a user-facing report, run
+`scripts/validate_bundle.py --format human BUNDLE.json`. Use the default JSON
+format only for machine-readable output or an explicitly requested JSON artifact.
 
 ```json
 {

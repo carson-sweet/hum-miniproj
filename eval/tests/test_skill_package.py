@@ -111,3 +111,9 @@ def test_skill_reserves_accountability_for_the_end_to_end_owner():
     text = " ".join((SKILL / "SKILL.md").read_text().lower().split())
     assert "use accountable only for the one end-to-end owner" in text
     assert "do not call a specialist accountable for a technical slice" in text
+
+
+def test_skill_requires_human_readable_validator_reports():
+    text = " ".join((SKILL / "SKILL.md").read_text().lower().split())
+    assert "--format human" in text
+    assert "do not paste raw json as the user-facing result" in text

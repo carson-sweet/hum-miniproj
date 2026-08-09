@@ -1,13 +1,17 @@
 # User-story implementation acceptance
 
-**Version 1.0 — 2026-08-09**
-**Verdict: all eight user stories are implemented and pass executable acceptance.**
+**Version 1.1 — 2026-08-09**
+**Verdict: all eight user stories are implemented; deterministic acceptance passes.**
+
+The first live user test exposed that bundle validation returned raw JSON instead
+of a human-readable result. US-OWN-001 now requires and tests deterministic
+plain-language reporting. A fresh-session user retest remains pending.
 
 ## Story evidence
 
 | Story | Implemented behavior | Acceptance evidence |
 |---|---|---|
-| US-OWN-001 | Four-criterion presence validation without grading weak answers | `eval/tests/test_validate_bundle.py`; MP-C02 |
+| US-OWN-001 | Human-readable four-criterion presence validation without grading weak answers | `eval/tests/test_validate_bundle.py`; MP-C02; MP-C09 pending |
 | US-OWN-002 | Fully answered technical-layer-only bundles fail `complete` | `eval/tests/test_validate_bundle.py`; MP-C03 |
 | US-OWN-003 | Complete-improvement splits require an independently launchable piece | `eval/tests/test_validate_split.py`; MP-C05 |
 | US-OWN-004 | Installer exposes identical validator behavior in Codex, Junie, and Claude paths | `eval/tests/test_install.py`; MP-C02 |
@@ -22,12 +26,13 @@ implementation files and executable acceptance tests.
 
 ## Deterministic acceptance
 
-- 178 tests passed with four live integrations deselected in the final repository-wide run.
+- 185 tests passed in the final repository-wide run after the human-readable
+  US-OWN-001 reporting correction.
 - The story-focused suite passed 40/40 before that correction; the strengthened board
   and Discovery-owner suites then passed 9/9.
 - Portability lint and the standard Agent Skill validator passed.
 
-The 178-test final repository-wide run is the authoritative deterministic total.
+The 185-test final repository-wide run is the authoritative deterministic total.
 
 ## Three-harness acceptance
 
@@ -42,9 +47,12 @@ or five-run mutation matrix was performed.
 | MP-C06 — refinement and estimation | PASS | PASS | PASS | `eval/runs/20260809T004450Z-480971000/` |
 | MP-C07 — ranked Discovery plan | PASS | PASS | PASS | `eval/runs/20260809T004724Z-586238000/` |
 | MP-C08 — request routing | PASS | PASS | PASS | `eval/runs/20260809T005019Z-203062000/` |
+| MP-C09 — human-readable bundle result | NOT RUN | NOT RUN | NOT RUN | Added after live user-test failure |
 
-All 18 contract-harness cells passed. Metered cost for these six acceptance runs was
-$1.2158, plus six Junie calls whose text-mode provider surface exposes no usage.
+All 18 previously run contract-harness cells passed. MP-C09 has not been run to avoid
+additional model spend before the fresh-session user retest. Metered cost for the six
+previous acceptance runs was $1.2158, plus six Junie calls whose text-mode provider
+surface exposes no usage.
 
 ## Boundary before hardening
 

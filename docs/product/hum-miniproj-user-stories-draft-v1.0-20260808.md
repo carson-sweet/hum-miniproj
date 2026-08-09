@@ -1,6 +1,6 @@
 # MiniProject Skill — User Stories
 
-**Version 1.1 (implemented draft) — 2026-08-09**
+**Version 1.2 (implemented draft) — 2026-08-09**
 **Format:** Gherkin (Given/When/Then)
 **Scope:** All personas; SLC subset marked
 **Audience:** Internal (Hum) — engineering handoff and eval-contract input
@@ -59,7 +59,7 @@ So that I do not commit to owning a technical layer wearing a MiniProject label
 Scenario: All four criteria have stated answers
   Given a proposed bundle with a stated answer for each of the four criteria
   When I run the bundle validator
-  Then it reports no findings
+  Then it reports in plain language that the result is valid and has no findings
   And it does not comment on the quality of any answer
 
 Scenario: A criterion has no stated answer

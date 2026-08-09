@@ -1,0 +1,35 @@
+id: MP-C09
+name: Bundle validation is reported in plain language
+stories: [US-OWN-001]
+targets:
+  - SKILL.md
+  - scripts/validate_bundle.py
+subject:
+  fixture: fixtures/p0-2
+  prompt: >-
+    Validate a MiniProject named "Widget reporting" whose complete answer is
+    "no", demoable answer is "not yet", owned answer is "unknown", and
+    launch_ready answer is "blocked". Save only the exact user-facing
+    deterministic validation result to validation-report.txt. Do not save raw
+    JSON and do not assess answer quality. Do the work; do not merely describe
+    the commands.
+  sandbox: workspace-write
+  timeout_s: 240
+  models:
+    claude: sonnet
+assert:
+  type: artifact
+  checks:
+    - kind: exists
+      path: validation-report.txt
+    - kind: contains
+      path: validation-report.txt
+      pattern: '\AVALID — All four required MiniProject criteria have stated answers\. The deterministic validator reported no findings\. Answer quality was not assessed\.\n?\Z'
+negative_control:
+  expect: FAIL
+  mutate:
+    file: scripts/validate_bundle.py
+    op: replace
+    pattern: 'if args.format == "human":'
+    value: 'if False:'
+harnesses: [codex, junie, claude]
