@@ -9,10 +9,10 @@ subject:
   prompt: >-
     Validate a MiniProject named "Widget reporting" whose complete answer is
     "no", demoable answer is "not yet", owned answer is "unknown", and
-    launch_ready answer is "blocked". Save only the exact user-facing
-    deterministic validation result to validation-report.txt. Do not save raw
-    JSON and do not assess answer quality. Do the work; do not merely describe
-    the commands.
+    launch_ready answer is "blocked". Run the bundled validator with human
+    formatting and redirect stdout directly to validation-report.txt in that
+    command. Do not reconstruct or edit the report by any other means. Do not
+    assess answer quality. Do the work; do not merely describe the commands.
   sandbox: workspace-write
   timeout_s: 240
   models:
@@ -30,6 +30,6 @@ negative_control:
   mutate:
     file: scripts/validate_bundle.py
     op: replace
-    pattern: 'if args.format == "human":'
-    value: 'if False:'
+    pattern: 'The deterministic validator reported no findings. '
+    value: 'No findings were reported. '
 harnesses: [codex, junie, claude]

@@ -1,0 +1,39 @@
+id: MP-C10
+name: Split validation is reported in plain language
+stories: [US-OWN-003]
+targets:
+  - SKILL.md
+  - references/workflows.md
+  - scripts/validate_split.py
+subject:
+  fixture: fixtures/p0-2
+  prompt: >-
+    Use the MiniProject skill to create and validate a split of "Account recovery
+    improvements". Create two complete MiniProjects: self-service lets a locked-out
+    customer reset a password and sign in, has no sibling dependency, and is owned
+    by Alice; admin-help lets an administrator restore access for a blocked customer,
+    depends on self-service, and is owned by Ben. Supply demoable and launch-ready
+    answers for both. Run the bundled split validator with human formatting and
+    redirect stdout directly to split-report.txt in that command. Do not reconstruct
+    or edit the report by any other means. Do the work; do not merely describe the
+    commands.
+  sandbox: workspace-write
+  timeout_s: 240
+  models:
+    claude: sonnet
+assert:
+  type: artifact
+  checks:
+    - kind: exists
+      path: split-report.txt
+    - kind: contains
+      path: split-report.txt
+      pattern: '\AVALID — 2 resulting MiniProjects passed validation\. Independently launchable: self-service\. The deterministic validator reported no findings\.\n?\Z'
+negative_control:
+  expect: FAIL
+  mutate:
+    file: scripts/validate_split.py
+    op: replace
+    pattern: 'VALID — {count} resulting MiniProjects passed validation. '
+    value: 'VALID — Split validation passed. '
+harnesses: [codex, junie, claude]

@@ -1,0 +1,38 @@
+id: MP-C14
+name: Request routing is reported in plain language
+stories: [US-REQ-001]
+targets:
+  - SKILL.md
+  - references/workflows.md
+  - scripts/route_request.py
+subject:
+  fixture: fixtures/p0-2
+  prompt: >-
+    Use the MiniProject skill request router twice. Route "Add the onsite optimization
+    widget to the sales blog" with human formatting and redirect stdout directly to
+    specific-report.txt in that command. Route "Improve onsite optimization" with
+    shaping owner Chelsea and redirect stdout directly to broad-report.txt in that
+    human-formatted command. Do not reconstruct or edit either report by any other
+    means. Do the work by running the bundled script; do not merely describe the
+    expected routes.
+  sandbox: workspace-write
+  timeout_s: 180
+  models:
+    claude: sonnet
+assert:
+  type: artifact
+  checks:
+    - kind: contains
+      path: specific-report.txt
+      pattern: '\ACHORE — Route this specific request through the fast lane\. Discovery is not required\.\n?\Z'
+    - kind: contains
+      path: broad-report.txt
+      pattern: '\APROJECT — Send this broad request to shaping\. Owner: Chelsea\. Next step: Define explicit in/out scope and create ranked Discovery questions\.\n?\Z'
+negative_control:
+  expect: FAIL
+  mutate:
+    file: scripts/route_request.py
+    op: replace
+    pattern: 'CHORE — Route this specific request through the fast lane. '
+    value: 'CHORE — Fast lane. '
+harnesses: [codex, junie, claude]

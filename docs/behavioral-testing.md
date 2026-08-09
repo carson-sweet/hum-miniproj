@@ -1,6 +1,6 @@
 # Behavioral Testing Approach
 
-**Version 1.1 — 2026-08-08**
+**Version 1.2 — 2026-08-09**
 
 How a skill made of instructions gets tested. Companion to the
 [implementation plan](implementation-plan.md).
@@ -63,6 +63,12 @@ contract criterion and the subject's output — never the skill under test.
 A judge that has read the instructions grades generously against them. A subject
 that can see the pass criterion writes to it.
 
+For Codex, isolate both `HOME` and `CODEX_HOME`. The disposable skill must live
+under the disposable `HOME/.agents/skills`; setting only `CODEX_HOME` still lets
+Codex discover and execute the globally installed user skill. Junie disables all
+default skill locations and receives only its disposable `--skill-location`.
+Claude receives only the disposable skill mounted into its container.
+
 ### 3. Assert on artifacts wherever an outcome is claimed
 
 Two assertion types:
@@ -110,10 +116,17 @@ about the others.
 | default | Run each contract's subject and judge; report per-harness results |
 | `--negative-control` | Apply each declared mutation, re-run, report any contract that still passes |
 | `--harness NAME` | Restrict to one harness |
-| `--held-out` | Run only the held-out set (see below) |
+| `--repeat N` | Run each selected contract and harness N times |
+| `--max-metered-cost USD` | Stop before the next subject call when spend plus the reserve would exceed the cap |
+| `--budget-since UTC` | Apply the cap across multiple invocations from one shared UTC start time |
+| `--budget-reserve USD` | Reserve room for the next subject call; defaults to $0.25 |
 
 Results are recorded per run with the model version and harness version, so a
 regression can be attributed rather than guessed at.
+
+The metered cap covers providers whose usage is available. Junie usage is recorded
+as unavailable and must be reported separately; it cannot be represented as zero
+cost or silently counted inside the cap.
 
 ## Held-out contracts
 

@@ -1,0 +1,38 @@
+id: MP-C13
+name: Discovery-plan validation is reported in plain language
+stories: [US-VAL-001]
+targets:
+  - SKILL.md
+  - references/workflows.md
+  - scripts/validate_discovery_plan.py
+subject:
+  fixture: fixtures/p0-2
+  prompt: >-
+    Use the MiniProject skill to shape "Onsite optimization v1" with explicit in
+    scope for sales-blog widget placement and widget performance reporting and out
+    scope for site-wide redesign and automated content generation. Create exactly
+    two ranked Discovery cards, each with one owner, a question, and a useful output.
+    Record Engineering acceptance with no returned cards. Run the bundled Discovery-
+    plan validator with human formatting and redirect stdout directly to
+    discovery-report.txt in that command. Do not reconstruct or edit the report by
+    any other means. Do the work; do not merely describe the commands.
+  sandbox: workspace-write
+  timeout_s: 240
+  models:
+    claude: sonnet
+assert:
+  type: artifact
+  checks:
+    - kind: exists
+      path: discovery-report.txt
+    - kind: contains
+      path: discovery-report.txt
+      pattern: '\AVALID — The Project has explicit in/out scope, 2 ranked Discovery cards, and Engineering acceptance with no returned cards\. The deterministic validator reported no findings\.\n?\Z'
+negative_control:
+  expect: FAIL
+  mutate:
+    file: scripts/validate_discovery_plan.py
+    op: replace
+    pattern: 'VALID — The Project has explicit in/out scope, {len(ranked)} ranked '
+    value: 'VALID — The Discovery plan passed with '
+harnesses: [codex, junie, claude]

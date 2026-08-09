@@ -53,16 +53,23 @@ def test_isolated_codex_home_links_auth_and_is_removed(tmp_path):
 
     with isolated_codex_home(source) as home:
         saved_home = home
+        saved_process_home = home.parent
+        assert home.name == ".codex"
         assert (home / "auth.json").is_symlink()
         assert (home / "auth.json").resolve() == auth.resolve()
         assert (home / "skills").is_dir()
+        assert (home.parent / ".agents" / "skills").is_dir()
 
     assert not saved_home.exists()
+    assert not saved_process_home.exists()
 
 
 def test_driver_scopes_subprocesses_to_its_codex_home(tmp_path):
-    driver = CodexDriver(codex_home=tmp_path)
-    assert driver.subprocess_env()["CODEX_HOME"] == str(tmp_path)
+    codex_home = tmp_path / ".codex"
+    driver = CodexDriver(codex_home=codex_home)
+    assert driver.subprocess_env()["CODEX_HOME"] == str(codex_home)
+    assert driver.subprocess_env()["HOME"] == str(tmp_path)
+    assert driver.subprocess_env()["HOME"] != str(Path.home())
 
 
 def test_isolated_codex_home_requires_authentication(tmp_path):

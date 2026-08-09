@@ -5,7 +5,8 @@
     python3 -m eval.run_contracts --harness codex --contract MP-C01
 
 Exit codes: 0 all good; 1 contract failure; 2 broken negative control;
-3 inert mutation, invalid contract, credential failure, or harness failure.
+3 inert mutation, invalid contract, credential failure, or harness failure;
+4 metered budget exhausted before the next subject call.
 """
 from __future__ import annotations
 
@@ -41,6 +42,23 @@ LOCAL_ENV = REPO / ".env.local"
 
 ALL_HARNESSES = ("codex", "junie", "claude")
 DETECTION_FLOOR = 0.8
+
+
+class BudgetExceeded(RuntimeError):
+    """Raised before a subject call would consume the reserved budget."""
+
+
+def enforce_metered_budget(
+    *, max_cost_usd: float, since: str, reserve_usd: float
+) -> float:
+    """Fail before a call when current spend plus its reserve exceeds the cap."""
+    spent = float(totals(since=since)["cost_usd"])
+    if spent + reserve_usd > max_cost_usd:
+        raise BudgetExceeded(
+            f"metered spend ${spent:.4f} plus ${reserve_usd:.4f} reserve "
+            f"would exceed ${max_cost_usd:.4f} cap"
+        )
+    return spent
 
 
 def classify(
@@ -145,12 +163,24 @@ def install_skill(src: Path, skill_root: Path) -> Path:
     return destination
 
 
+def install_codex_skill(src: Path, codex_home: Path) -> Path:
+    """Install once under disposable HOME and link the Codex-specific path."""
+    codex_home = Path(codex_home)
+    installed = install_skill(src, codex_home.parent / ".agents" / "skills")
+    link = codex_home / "skills" / installed.name
+    if link.exists() or link.is_symlink():
+        raise RuntimeError(f"refusing to overwrite isolated skill path: {link}")
+    link.parent.mkdir(parents=True, exist_ok=True)
+    link.symlink_to(installed)
+    return installed
+
+
 @contextmanager
 def isolated_subject_driver(harness: str) -> Iterator[tuple[object, Path]]:
     """Yield a driver plus the exact disposable skill copy it will load."""
     if harness == "codex":
         with isolated_codex_home() as home:
-            installed = install_skill(SKILL_SRC, home / "skills")
+            installed = install_codex_skill(SKILL_SRC, home)
             yield CodexDriver(codex_home=home), installed
         return
 
@@ -292,7 +322,29 @@ def main() -> int:
         "--repeat", type=int, default=1,
         help="runs per contract; negative controls need 5 to score a rate",
     )
+    parser.add_argument(
+        "--max-metered-cost",
+        type=float,
+        help="stop before the next subject call would exceed this USD cap",
+    )
+    parser.add_argument(
+        "--budget-since",
+        help="include ledger rows at or after this UTC timestamp in the cap",
+    )
+    parser.add_argument(
+        "--budget-reserve",
+        type=float,
+        default=0.25,
+        help="USD reserved for each next subject call (default: 0.25)",
+    )
     args = parser.parse_args()
+
+    if args.max_metered_cost is not None and args.max_metered_cost <= 0:
+        print("invalid budget: --max-metered-cost must be positive")
+        return 3
+    if args.budget_reserve < 0:
+        print("invalid budget: --budget-reserve may not be negative")
+        return 3
 
     try:
         contracts = load_contracts(args.contract)
@@ -328,10 +380,19 @@ def main() -> int:
         print(f"harness {harness} ({versions[harness]})")
 
     started_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    budget_since = args.budget_since or started_at
     run_id = f"{time.strftime('%Y%m%dT%H%M%SZ', time.gmtime())}-{time.time_ns() % 1_000_000_000:09d}"
     os.environ["EVAL_RUN_ID"] = run_id
     print(f"mode {'negative-control' if args.negative_control else 'normal'}")
     print(f"judge {JUDGE_MODEL}\n")
+    if args.max_metered_cost is not None:
+        print(
+            f"metered budget ${args.max_metered_cost:.2f} since {budget_since}; "
+            f"${args.budget_reserve:.2f} reserved per next subject call"
+        )
+        if "junie" in selected:
+            print("note: Junie usage is unavailable and is not included in the metered cap")
+        print()
     if args.negative_control and args.repeat < 5:
         print(
             f"note: --repeat {args.repeat}; the plan asks for 5 to score a detection rate.\n"
@@ -340,12 +401,23 @@ def main() -> int:
     outcomes = []
     for contract in contracts:
         for harness in select_harnesses(contract, args.harness):
-            runs = [
-                run_one(
-                    contract, harness, args.negative_control, args.keep_workdirs
+            runs = []
+            for _ in range(args.repeat):
+                if args.max_metered_cost is not None:
+                    try:
+                        enforce_metered_budget(
+                            max_cost_usd=args.max_metered_cost,
+                            since=budget_since,
+                            reserve_usd=args.budget_reserve,
+                        )
+                    except BudgetExceeded as exc:
+                        print(f"BUDGET-STOP — {exc}")
+                        return 4
+                runs.append(
+                    run_one(
+                        contract, harness, args.negative_control, args.keep_workdirs
+                    )
                 )
-                for _ in range(args.repeat)
-            ]
             verdict, rate = classify(
                 [run.verdict for run in runs], args.negative_control
             )

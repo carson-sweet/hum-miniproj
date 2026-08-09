@@ -7,9 +7,12 @@ import yaml
 from eval.mutate import apply_mutations
 from eval.run_contracts import (
     ALL_HARNESSES,
+    BudgetExceeded,
     REPO,
     SKILL_SRC,
     Outcome,
+    enforce_metered_budget,
+    install_codex_skill,
     load_contracts,
     select_harnesses,
     select_subject_model,
@@ -142,3 +145,85 @@ def test_artifact_contracts_pin_claude_to_sonnet():
     for contract in load_contracts(None):
         if contract["assert"]["type"] == "artifact":
             assert contract["subject"]["models"]["claude"] == "sonnet"
+
+
+def test_every_user_facing_workflow_has_an_exact_plain_language_contract():
+    expected = {
+        "MP-C09": ({"US-OWN-001"}, "The deterministic validator reported no findings. "),
+        "MP-C10": ({"US-OWN-003"}, "VALID — {count} resulting MiniProjects passed validation. "),
+        "MP-C11": ({"US-FAC-001"}, "VALID — Tech Refinement resolved {resolved} {noun}. "),
+        "MP-C12": ({"US-FAC-002"}, "VALID — Tech Estimation satisfies the measurement rules for every item. "),
+        "MP-C13": ({"US-VAL-001"}, "VALID — The Project has explicit in/out scope, {len(ranked)} ranked "),
+        "MP-C14": ({"US-REQ-001"}, "CHORE — Route this specific request through the fast lane. "),
+    }
+
+    for contract_id, (stories, removed_wording) in expected.items():
+        contract = load_contracts(contract_id)[0]
+        assert set(contract["stories"]) == stories
+        assert contract["assert"]["type"] == "artifact"
+        prompt = contract["subject"]["prompt"].lower()
+        assert "redirect stdout directly" in prompt
+        assert "do not reconstruct" in prompt
+        patterns = [
+            check["pattern"]
+            for check in contract["assert"]["checks"]
+            if check["kind"] == "contains"
+        ]
+        assert patterns
+        assert all(
+            pattern.startswith(r"\A") and pattern.endswith(r"\n?\Z")
+            for pattern in patterns
+        )
+        mutation = contract["negative_control"]["mutate"]
+        assert mutation["pattern"] == removed_wording
+        assert mutation["value"] != removed_wording
+
+
+def test_metered_budget_reserves_room_for_the_next_subject_call(monkeypatch):
+    monkeypatch.setattr(
+        "eval.run_contracts.totals",
+        lambda **_: {"cost_usd": 9.80, "calls": 1, "unpriced_calls": 0},
+    )
+
+    with pytest.raises(BudgetExceeded, match=r"\$9\.8000.*\$10\.0000"):
+        enforce_metered_budget(
+            max_cost_usd=10.0,
+            since="2026-08-09T00:00:00Z",
+            reserve_usd=0.25,
+        )
+
+
+def test_metered_budget_allows_a_call_with_reserved_room(monkeypatch):
+    monkeypatch.setattr(
+        "eval.run_contracts.totals",
+        lambda **_: {"cost_usd": 9.70, "calls": 1, "unpriced_calls": 0},
+    )
+
+    assert enforce_metered_budget(
+        max_cost_usd=10.0,
+        since="2026-08-09T00:00:00Z",
+        reserve_usd=0.25,
+    ) == 9.70
+
+
+def test_codex_skill_is_installed_under_the_disposable_process_home(tmp_path):
+    codex_home = tmp_path / ".codex"
+    (codex_home / "skills").mkdir(parents=True)
+
+    installed = install_codex_skill(SKILL_SRC, codex_home)
+
+    assert installed == tmp_path / ".agents" / "skills" / "miniproject"
+    link = codex_home / "skills" / "miniproject"
+    assert link.is_symlink()
+    assert link.resolve() == installed.resolve()
+
+
+def test_behavioral_docs_explain_budget_and_subject_home_isolation():
+    text = (REPO / "docs" / "behavioral-testing.md").read_text().lower()
+    for required in (
+        "--max-metered-cost",
+        "--budget-since",
+        "junie usage",
+        "isolate both `home` and `codex_home`",
+    ):
+        assert required in text
