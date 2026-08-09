@@ -5,6 +5,8 @@
 How a skill made of instructions gets tested. Companion to the
 [implementation plan](implementation-plan.md).
 
+For setup instructions, commands, contract-by-contract use cases, result interpretation, and failure response, see the [developer testing guide](developer-testing-guide.md).
+
 ---
 
 ## Why this is the primary artifact
