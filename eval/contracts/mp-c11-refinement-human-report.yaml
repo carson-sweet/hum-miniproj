@@ -1,0 +1,37 @@
+id: MP-C11
+name: Tech Refinement is reported in plain language
+stories: [US-FAC-001]
+targets:
+  - SKILL.md
+  - references/workflows.md
+  - scripts/validate_board.py
+subject:
+  fixture: fixtures/p0-2
+  prompt: >-
+    Use the MiniProject skill to create a Tech Refinement board with exactly five
+    resolved cards: two named MiniProjects with one owner each, two named Chores,
+    and one More Discovery result with an owner and next question. Put no PR,
+    implementation, test, or rollout details on the board. Run the bundled board
+    validator with human formatting and redirect stdout directly to
+    refinement-report.txt in that command. Do not reconstruct or edit the report by
+    any other means. Do the work; do not merely describe the commands.
+  sandbox: workspace-write
+  timeout_s: 240
+  models:
+    claude: sonnet
+assert:
+  type: artifact
+  checks:
+    - kind: exists
+      path: refinement-report.txt
+    - kind: contains
+      path: refinement-report.txt
+      pattern: '\AVALID — Tech Refinement resolved 5 cards\. The deterministic validator reported no findings\.\n?\Z'
+negative_control:
+  expect: FAIL
+  mutate:
+    file: scripts/validate_board.py
+    op: replace
+    pattern: 'VALID — Tech Refinement resolved {resolved} {noun}. '
+    value: 'VALID — Tech Refinement passed. '
+harnesses: [codex, junie, claude]

@@ -49,8 +49,10 @@ def isolated_codex_home(source_home: Path | None = None) -> Iterator[Path]:
         raise FileNotFoundError(f"Codex authentication not found at {auth}")
 
     with tempfile.TemporaryDirectory(prefix="codex-eval-home-") as tmp:
-        home = Path(tmp)
-        (home / "skills").mkdir()
+        process_home = Path(tmp)
+        home = process_home / ".codex"
+        (home / "skills").mkdir(parents=True)
+        (process_home / ".agents" / "skills").mkdir(parents=True)
         (home / "auth.json").symlink_to(auth.resolve())
         yield home
 
@@ -66,6 +68,7 @@ class CodexDriver:
             return None
         env = os.environ.copy()
         env["CODEX_HOME"] = str(self.codex_home)
+        env["HOME"] = str(self.codex_home.parent)
         return env
 
     def probe(self) -> ProbeResult:

@@ -7,9 +7,9 @@ complete improvement rather than by technical layer.
 Runs anywhere the Agent Skills standard is supported: Claude Code, Codex, Junie,
 and others.
 
-**Status:** All eight product user stories are implemented with deterministic and
-three-harness acceptance coverage. User testing comes next; hardening is deferred
-until after that feedback.
+**Status:** All eight product user stories are implemented. Human-readable results
+for every interactive workflow have deterministic, three-harness, and repeated
+negative-control coverage. Broader prompt and long-session hardening remain open.
 
 ## The problem
 

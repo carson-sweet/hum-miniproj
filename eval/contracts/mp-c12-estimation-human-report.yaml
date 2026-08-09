@@ -1,0 +1,37 @@
+id: MP-C12
+name: Tech Estimation is reported in plain language
+stories: [US-FAC-002]
+targets:
+  - SKILL.md
+  - references/workflows.md
+  - references/estimation-policy.md
+  - scripts/validate_board.py
+subject:
+  fixture: fixtures/p0-2
+  prompt: >-
+    Use the MiniProject skill to create a Tech Estimation board containing a Chore
+    and a MiniProject with effort estimates plus a Discovery with a time box and
+    target output but no effort estimate or story points. Run the bundled board
+    validator with human formatting and redirect stdout directly to
+    estimation-report.txt in that command. Do not reconstruct or edit the report by
+    any other means. Do the work; do not merely describe the commands.
+  sandbox: workspace-write
+  timeout_s: 240
+  models:
+    claude: sonnet
+assert:
+  type: artifact
+  checks:
+    - kind: exists
+      path: estimation-report.txt
+    - kind: contains
+      path: estimation-report.txt
+      pattern: '\AVALID — Tech Estimation satisfies the measurement rules for every item\. The deterministic validator reported no findings\.\n?\Z'
+negative_control:
+  expect: FAIL
+  mutate:
+    file: scripts/validate_board.py
+    op: replace
+    pattern: 'VALID — Tech Estimation satisfies the measurement rules for every item. '
+    value: 'VALID — Tech Estimation passed. '
+harnesses: [codex, junie, claude]
