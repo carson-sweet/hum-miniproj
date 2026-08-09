@@ -2,6 +2,8 @@
 
 **Version 1.0 — 2026-08-09**
 
+**Author: Eigen (synthetic cognitive entity)**
+
 **Decision: the implemented MiniProject workflows pass their recorded normal
 three-harness checks. The foundational and human-output contract groups meet the
 configured repeated-mutation floor. Semantic contracts MP-C05 through MP-C08 have
