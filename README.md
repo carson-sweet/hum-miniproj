@@ -9,6 +9,42 @@ and others.
 
 **Status:** All ten product user stories and all six implementation milestones are complete. All 16 behavioral contracts passed five-run negative-control qualification in Codex, Junie, and Claude. Broader prompt-paraphrase and long-session hardening remain open.
 
+## Quick start / TL;DR
+
+The skill is implemented and its planned acceptance and hardening work is complete. Install `skills/miniproject/` in any Agent Skills-compatible tool, then ask the agent to classify, refine, validate, estimate, or split work using the MiniProject operating model. The [MiniProject operating model](docs/miniproject-model.md) explains the workflows, and the [Hardening and Behavioral Testing Report](docs/hardening-and-behavioral-testing-report.md) documents how the implementation was verified.
+
+Free local verification does not invoke model providers:
+
+```sh
+python3 -m pytest -q -m 'not integration'
+python3 scripts/lint_portable.py
+```
+
+Do not remove the pytest marker exclusion unless you intentionally want to run paid behavioral tests with configured credentials and a bounded budget.
+
+## Testing summary
+
+| Evidence | Final result |
+| --- | ---: |
+| Product implementation | 10 of 10 user stories; 6 of 6 milestones |
+| Deterministic suite | 220 passed; 4 paid integration tests deselected |
+| Portability lint | PASS |
+| Standard Agent Skill validation | PASS |
+| Normal behavioral acceptance | 48 of 48 contract-harness cells passed |
+| Repeated negative-control qualification | 240 of 240 final mutations detected |
+| Per-cell mutation floor | Every cell passed 5 of 5, exceeding the configured 4-of-5 floor |
+| Harnesses | Codex, Junie, and Claude |
+
+The 16 behavioral contracts cover foundational MiniProject rules, user-story semantics, human-readable workflow results, and the continuous-improvement workflow. Fifteen assert on produced artifacts; one judges the response because its requirement concerns how accountable ownership is framed. The final matrix includes five mutation repetitions for every contract in every harness, so a strong aggregate cannot hide a weak contract-harness cell.
+
+Two human-output workflows—bundle validation and split validation—also passed manual fresh-session user tests after the first bundle test exposed raw JSON as unusable output. The other four human-output workflows have automated three-harness evidence but have not each received a separate manual fresh-session user test.
+
+The repository ledgers contain 1,190 recorded calls and $39.1985 in metered model fees. Of those calls, 248 have unavailable pricing, and substantial early work predates metering, so this is a lower bound rather than an all-project total. The detailed report separates each bounded hardening phase, excluded runs, and unpriced Junie calls.
+
+These results establish compliance for the recorded prompts, models, CLI versions, and isolated environments. They do not measure arbitrary prompt paraphrases, long-session instruction competition, persuasive answer quality, or future model drift. Those are documented follow-on risks, not unfinished implementation-plan milestones.
+
+Full methodology, run identifiers, exclusions, cost boundaries, and the final-results amendment are in the [Hardening and Behavioral Testing Report](docs/hardening-and-behavioral-testing-report.md).
+
 ## The problem
 
 The agile default splits work by technical layer — frontend, backend, data, infra,

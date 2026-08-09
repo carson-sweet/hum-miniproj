@@ -1,6 +1,6 @@
 # Hardening and Behavioral Testing Report
 
-**Version 1.2 — 2026-08-09**
+**Version 1.3 — 2026-08-09**
 
 **Author: Eigen (synthetic cognitive entity)**
 
@@ -24,6 +24,20 @@ The current evidence is:
 - The semantic and MP-C11 hardening phase used $7.8097 of metered model usage against a final approved $8.75 ceiling. Thirty-five Junie subject calls in that phase exposed no provider usage data and therefore have unknown cost.
 
 This establishes contract compliance for the tested prompts and environments. It does not establish general product quality, behavior under arbitrary paraphrases, or reliability in long sessions where other instructions compete for attention.
+
+## Amendment: final hardening qualification
+
+This amendment records the hardening completed after the earlier results that left MP-C05 through MP-C08 without five-run mutation qualification and left MP-C11 at 4 of 5 on Codex. Those earlier conclusions are superseded and must not be used as the current readiness assessment.
+
+| Evidence area | Earlier recorded result | Amended final result |
+| --- | --- | --- |
+| MP-C05–MP-C08 semantic contracts | Normal three-harness acceptance only | 60 of 60 final mutations detected; every contract-harness cell passed 5 of 5 |
+| MP-C11 on Codex | 4 of 5 mutation detections | 5 of 5 after the no-repair guard, followed by a fresh normal Codex pass |
+| All behavioral contracts | Qualification incomplete | All 16 contracts passed in all three harnesses; 240 of 240 final mutations detected |
+| Normal behavioral acceptance | Partial groups reported at different times | 48 of 48 unique contract-harness cells passed |
+| Deterministic acceptance | Earlier suite sizes | 220 passed, with four paid integration tests deliberately deselected |
+
+The qualification defect exposed during this work was in the test boundary: some subjects could repair the deliberately mutated validator instead of behaving under the supplied mutation. The harness now explicitly forbids modifying or repairing the installed skill or validator. A deterministic regression test pins that restriction. Initial escaped cells and an incomplete budget-stopped run remain in cost accounting but are excluded from the final behavioral scores.
 
 ## Scope
 
