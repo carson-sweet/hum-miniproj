@@ -1,6 +1,6 @@
 ---
 name: miniproject
-description: Decide what kind of work a request is and how it belongs on a board by classifying it as a Project, Discovery, MiniProject, or Chore; shape complete owner-led improvements; apply the estimation policy; and validate proposed bundles. Use when planning, refining, splitting, estimating, or reviewing any delivery request, including a feature, bug, typo, one-line fix, technical-layer ticket, or broad product goal.
+description: Decide what kind of work a request is and how it belongs on a board; classify and route it as a Project, Discovery, MiniProject, or Chore; shape ranked Discovery cards; run Tech Refinement and Tech Estimation checks; split oversized bundles along complete-improvement boundaries; and validate owner-led, launch-ready MiniProjects. Use during Product Refinement, Tech Refinement, Tech Estimation, sprint planning, work intake, bundle validation, or splitting for any feature, bug, typo, technical-layer ticket, specific customer ask, or broad product goal.
 ---
 
 # MiniProject
@@ -13,7 +13,18 @@ multiple small implementation changes and reviews.
 
 1. Read [work-types.md](references/work-types.md) and classify the request before
    estimating or splitting it.
-2. Follow the route for that work type:
+2. Read [workflows.md](references/workflows.md), choose the executable workflow, and
+   run its bundled script:
+   - **Validate a proposed bundle:** use `scripts/validate_bundle.py`.
+   - **Validate a proposed split:** use `scripts/validate_split.py`.
+   - **Close Tech Refinement:** use `scripts/validate_board.py` with stage
+     `tech_refinement`.
+   - **Check Tech Estimation:** use `scripts/validate_board.py` with stage
+     `tech_estimation`.
+   - **Shape a broad Project:** use `scripts/validate_discovery_plan.py`.
+   - **Route a work request:** use `scripts/route_request.py`; ask for the shaping
+     owner when a broad request does not name one.
+3. Follow the route for the resulting work type:
    - **Chore fast lane:** identify it as a Chore and do not run bundle validation.
      Handle it as a small, specific, low-variance request.
    - **Discovery:** define the question, owner, time box, decision artifact, and
@@ -25,16 +36,21 @@ multiple small implementation changes and reviews.
      before delivery bundles are trustworthy.
    - **MiniProject:** gather a stated answer for each bundle criterion, then run
      the deterministic validator.
-3. Read [bundling-criteria.md](references/bundling-criteria.md) when shaping,
+4. Read [bundling-criteria.md](references/bundling-criteria.md) when shaping,
    splitting, or reviewing a MiniProject.
-4. Read [estimation-policy.md](references/estimation-policy.md) before discussing
+5. Read [estimation-policy.md](references/estimation-policy.md) before discussing
    effort or timing.
-5. Read [decision-points.md](references/decision-points.md) when facilitating
+6. Read [decision-points.md](references/decision-points.md) when facilitating
    prioritization, refinement, estimation, or sprint selection.
 
-## Validate a MiniProject
+## Execute the selected workflow
 
-Represent the proposal as JSON:
+Use the exact input schema in [workflows.md](references/workflows.md). Write the
+artifact, run the corresponding script using its path inside this skill, and use
+its structured findings to revise the artifact. Do not claim that a workflow is
+valid unless the script exits 0.
+
+For a single MiniProject, represent the proposal as JSON:
 
 ```json
 {
@@ -49,14 +65,12 @@ Represent the proposal as JSON:
 }
 ```
 
-Run the bundled `scripts/validate_bundle.py` using its path inside this skill and
-pass the proposal file. Treat exit 0 as structurally valid, exit 1 as missing
-answers, and exit 2 as invalid input.
+Run `scripts/validate_bundle.py` and pass the proposal file. Treat exit 0 as valid,
+exit 1 as findings that require revision, and exit 2 as invalid input.
 
-The validator checks presence only. Never claim it approved the quality of an
-answer. If it reports missing criteria, obtain those answers and rerun it. If the
-answers reveal a technical-layer slice, reshape the work into a complete
-improvement or return it to Discovery.
+The validator checks answer presence and rejects an explicitly technical-layer-only
+boundary. It does not grade whether any other answer is persuasive. If it reports
+findings, revise or split the work and rerun it.
 
 ## Interaction rules
 

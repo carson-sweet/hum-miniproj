@@ -2,10 +2,12 @@ import json
 import shutil
 
 import pytest
+import yaml
 
 from eval.mutate import apply_mutations
 from eval.run_contracts import (
     ALL_HARNESSES,
+    REPO,
     SKILL_SRC,
     Outcome,
     load_contracts,
@@ -35,6 +37,17 @@ def test_every_contract_has_an_applicable_negative_control(tmp_path):
 def test_every_contract_claims_all_three_harnesses():
     for contract in load_contracts(None):
         assert set(contract["harnesses"]) == set(ALL_HARNESSES)
+
+
+def test_behavioral_contracts_cover_every_user_story():
+    coverage = yaml.safe_load((REPO / "eval" / "user_story_coverage.yaml").read_text())
+    claimed = {
+        story_id
+        for contract in load_contracts(None)
+        for story_id in contract.get("stories", [])
+    }
+
+    assert claimed == set(coverage)
 
 
 def test_at_least_one_contract_asserts_on_an_artifact():

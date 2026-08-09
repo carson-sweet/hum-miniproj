@@ -1,0 +1,38 @@
+id: MP-C07
+name: A broad Project becomes accepted ranked Discovery cards with explicit scope
+stories: [US-VAL-001]
+targets:
+  - SKILL.md
+  - references/workflows.md
+  - scripts/validate_discovery_plan.py
+subject:
+  fixture: fixtures/p0-2
+  prompt: >-
+    Use the MiniProject skill to shape "Onsite optimization v1" in discovery-plan.json.
+    Scope in sales-blog widget placement and widget performance reporting. Scope out
+    a site-wide redesign and automated content generation. Create at least two ranked
+    Discovery cards; every card must have a question, owner, and useful output and no
+    technical bundle. Record Engineering review as accepted with zero returned cards.
+    Run the bundled Discovery-plan validator and save its exact output as
+    discovery-plan-result.json. Do the work; do not merely describe it.
+  sandbox: workspace-write
+  timeout_s: 240
+  models:
+    claude: sonnet
+assert:
+  type: artifact
+  checks:
+    - kind: contains
+      path: discovery-plan-result.json
+      pattern: '"status": "valid"'
+    - kind: contains
+      path: discovery-plan-result.json
+      pattern: '"returned_cards": \[\]'
+negative_control:
+  expect: FAIL
+  mutate:
+    file: scripts/validate_discovery_plan.py
+    op: replace
+    pattern: 'if review.get("status") != "accepted" or returned_cards:'
+    value: 'if True:'
+harnesses: [codex, junie, claude]

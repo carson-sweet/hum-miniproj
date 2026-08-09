@@ -1,5 +1,6 @@
 id: MP-C02
 name: Presence-only validation does not grade answer quality
+stories: [US-OWN-001, US-OWN-004]
 targets:
   - SKILL.md
   - scripts/validate_bundle.py

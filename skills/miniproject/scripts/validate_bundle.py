@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
+import re
 from typing import Any
 
 
@@ -14,6 +15,19 @@ CRITERIA = {
     "owned": "State who will own the work end to end.",
     "launch_ready": "State what will make the improvement safe to launch.",
 }
+
+TECHNICAL_LAYER_ONLY = re.compile(
+    r"(?:^|\b)(?:only\s+)?(?:the\s+)?"
+    r"(?:frontend|backend|api|database|data(?:\s+layer)?|infrastructure|qa|testing?)"
+    r"\s+(?:work|changes?|tasks?|endpoints?|components?|migration|layer)(?:\b|$)",
+    re.IGNORECASE,
+)
+
+
+def is_technical_layer_only(bundle: dict[str, Any], complete_answer: str) -> bool:
+    """Detect an explicit technical-layer boundary without grading answer quality."""
+    name = str(bundle.get("name") or "")
+    return bool(TECHNICAL_LAYER_ONLY.search(name) or TECHNICAL_LAYER_ONLY.search(complete_answer))
 
 
 def validate_bundle(bundle: dict[str, Any]) -> dict[str, Any]:
@@ -59,6 +73,24 @@ def validate_bundle(bundle: dict[str, Any]) -> dict[str, Any]:
                     "message": message,
                 }
             )
+
+    complete_answer = answers.get("complete")
+    if (
+        isinstance(complete_answer, str)
+        and complete_answer.strip()
+        and is_technical_layer_only(bundle, complete_answer)
+    ):
+        findings.append(
+            {
+                "criterion": "complete",
+                "code": "technical-layer-only",
+                "message": (
+                    "Name a complete behavior or operational improvement, not a "
+                    "frontend, backend, data, infrastructure, testing, or other "
+                    "technical-layer slice."
+                ),
+            }
+        )
 
     return {
         "schema_version": 1,

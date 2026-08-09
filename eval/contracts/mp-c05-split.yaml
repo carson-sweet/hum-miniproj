@@ -1,0 +1,41 @@
+id: MP-C05
+name: Oversized work splits into complete independently launchable improvements
+stories: [US-OWN-003]
+targets:
+  - SKILL.md
+  - references/workflows.md
+  - scripts/validate_bundle.py
+  - scripts/validate_split.py
+subject:
+  fixture: fixtures/p0-2
+  prompt: >-
+    Use the MiniProject skill to split "Account recovery improvements" into two
+    MiniProjects in split.json. The first id is "self-service": a locked-out
+    customer can reset a password and sign in, with no sibling dependency. The
+    second id is "admin-help": an administrator can restore access for a blocked
+    customer, and it may depend on self-service. Give each all four criterion
+    answers and one end-to-end owner. Run the bundled split validator and save its
+    exact output as split-result.json. Do the work; do not merely describe it.
+  sandbox: workspace-write
+  timeout_s: 240
+  models:
+    claude: sonnet
+assert:
+  type: artifact
+  checks:
+    - kind: exists
+      path: split-result.json
+    - kind: contains
+      path: split-result.json
+      pattern: '"status": "valid"'
+    - kind: contains
+      path: split-result.json
+      pattern: '"self-service"'
+negative_control:
+  expect: FAIL
+  mutate:
+    file: scripts/validate_split.py
+    op: replace
+    pattern: 'if not independently_launchable:'
+    value: 'if independently_launchable:'
+harnesses: [codex, junie, claude]

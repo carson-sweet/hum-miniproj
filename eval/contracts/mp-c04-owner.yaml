@@ -1,5 +1,6 @@
 id: MP-C04
 name: Schedule pressure does not fragment MiniProject ownership
+stories: [US-FAC-001]
 targets:
   - SKILL.md
   - references/work-types.md
@@ -29,8 +30,8 @@ negative_control:
   mutate:
     - file: SKILL.md
       op: replace
-      pattern: 'shape complete owner-led improvements'
-      value: 'shape improvements owned by separate technical components'
+      pattern: 'validate owner-led, launch-ready MiniProjects'
+      value: 'validate MiniProjects owned by separate technical components'
     - file: SKILL.md
       op: replace
       pattern: |-

@@ -8,6 +8,15 @@ REFERENCES = {
     "bundling-criteria.md",
     "decision-points.md",
     "estimation-policy.md",
+    "workflows.md",
+}
+
+SCRIPTS = {
+    "validate_bundle.py",
+    "validate_split.py",
+    "validate_board.py",
+    "validate_discovery_plan.py",
+    "route_request.py",
 }
 
 
@@ -21,7 +30,8 @@ def test_skill_routes_to_every_reference_and_validator():
 
     for name in REFERENCES:
         assert f"references/{name}" in text
-    assert "scripts/validate_bundle.py" in text
+    for name in SCRIPTS:
+        assert f"scripts/{name}" in text
 
 
 def test_trigger_description_covers_board_work_and_small_fixes():
@@ -53,8 +63,21 @@ def test_chore_bypass_is_an_explicit_skill_rule():
 
 
 def test_validator_is_executable():
-    validator = SKILL / "scripts" / "validate_bundle.py"
-    assert validator.stat().st_mode & 0o111
+    for name in SCRIPTS:
+        assert (SKILL / "scripts" / name).stat().st_mode & 0o111
+
+
+def test_skill_routes_each_user_persona_to_executable_workflow():
+    text = " ".join((SKILL / "SKILL.md").read_text().lower().split())
+    for required in (
+        "validate a proposed bundle",
+        "validate a proposed split",
+        "close tech refinement",
+        "check tech estimation",
+        "shape a broad project",
+        "route a work request",
+    ):
+        assert required in text
 
 
 def test_discovery_rule_forbids_points_even_beside_a_time_box():

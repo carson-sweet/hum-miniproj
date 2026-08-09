@@ -11,7 +11,7 @@ REPO = Path(__file__).resolve().parents[2]
 SCRIPT = REPO / "skills" / "miniproject" / "scripts" / "validate_bundle.py"
 
 
-def complete_bundle(**overrides):
+def complete_bundle(*, name="Recover a locked account", **overrides):
     criteria = {
         "complete": "Delivers the customer-visible account recovery flow.",
         "demoable": "Demo recovery from request through successful sign-in.",
@@ -21,7 +21,7 @@ def complete_bundle(**overrides):
     criteria.update(overrides)
     return {
         "work_type": "miniproject",
-        "name": "Recover a locked account",
+        "name": name,
         "criteria": criteria,
     }
 
@@ -43,11 +43,33 @@ def test_rejects_partial_technical_layer_with_missing_answers():
         "launch_ready",
     ]
     assert {finding["criterion"] for finding in result["findings"]} == {
+        "complete",
         "demoable",
         "owned",
         "launch_ready",
     }
-    assert {finding["code"] for finding in result["findings"]} == {"missing-answer"}
+    assert {finding["code"] for finding in result["findings"]} == {
+        "missing-answer",
+        "technical-layer-only",
+    }
+
+
+def test_us_own_002_rejects_backend_only_even_when_every_answer_is_present():
+    result = validate_bundle(
+        complete_bundle(
+            name="Backend API changes for widget reporting",
+            complete="Backend endpoints are implemented.",
+            demoable="The API responses can be inspected.",
+            owned="Ben owns the API work.",
+            launch_ready="The endpoints have tests.",
+        )
+    )
+
+    assert result["status"] == "invalid"
+    assert {
+        (finding["criterion"], finding["code"])
+        for finding in result["findings"]
+    } == {("complete", "technical-layer-only")}
 
 
 def test_accepts_complete_improvement_with_all_four_answers():
