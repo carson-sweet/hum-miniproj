@@ -2,8 +2,6 @@
 
 **Version 1.0 — 2026-08-09**
 
-This guide explains how testing works in this repository, why the test harness is designed the way it is, how to run each kind of test safely, how to read the results, and what to do when a test finds a problem. It starts with the basic concepts. No prior experience with language-model evaluation is required.
-
 ## Contents
 
 1. [What is being tested](#1-what-is-being-tested)
@@ -57,36 +55,15 @@ eval/
 └── cost.py                 Usage ledger and cost reporting
 ```
 
-## 2. Why ordinary tests are necessary but not sufficient
+## 2. Enhancing the basic testing harness
 
-Most application code has a useful property: the same code and input normally produce the same result. A unit test can call a function, compare the return value with an expected value, and give a stable pass or fail.
+Unit tests cover the Python validators, formatters, mutation engine, drivers, and runner. They do not establish that an agent loaded the intended skill, chose the correct workflow, performed the requested work, or behaved consistently across Codex, Junie, and Claude.
 
-The Python validators in this repository work that way, so ordinary unit tests are the right tool for them.
+Behavioral contracts cover that gap by running real agents in isolated environments. Artifact assertions distinguish completed work from a description of the work, and negative controls distinguish behavior caused by the skill from behavior the model would produce without it. Both test layers are required because they make different claims.
 
-The skill instructions do not have that property. They influence a model rather than directly calculating an answer. The model may follow an instruction on one run and overlook it on another. This is what “probabilistic” means in this guide: identical test setup can produce more than one possible result. A model update, command-line interface (CLI) update, system prompt change, different tool permissions, or a longer conversation can change the result without changing this repository.
+## 3. Terminology
 
-That creates several risks that ordinary tests cannot see:
-
-- The instructions can be syntactically valid but ineffective.
-- The agent can describe the correct action without performing it.
-- A test can pass because the model already knows a sensible rule, even if the skill instruction is missing.
-- A test can pass in Codex but fail in Junie or Claude because each harness supplies different surrounding instructions and tools.
-- A response-grading model can be influenced by seeing the same instructions as the subject it grades.
-- A test can accidentally load the developer's globally installed skill instead of the changed copy being tested.
-
-Behavioral tests address those risks by running real agents in isolated environments and checking what they actually produce. They complement deterministic tests; they do not replace them.
-
-## 3. Essential vocabulary
-
-These terms appear in the runner, contract files, result records, and this guide.
-
-### Model
-
-The language model is the service that interprets text and generates the next response or action. A model does not receive repository files, tools, skills, or conversation history automatically; the coding-agent application decides what context and capabilities to provide.
-
-### Coding agent
-
-A coding agent is the application around a model. It supplies system instructions, file and shell tools, skill discovery, permissions, session storage, and a user interface. Codex, Junie, and Claude Code are coding agents. Changing the application or its configuration can change behavior even when the underlying model stays the same.
+These terms appear in the runner, contract files, result records, and this guide. This section describes how these common terms are used in the context of this project to ensure clarity.
 
 ### Skill
 
@@ -94,7 +71,7 @@ The package under test: `skills/miniproject/`. It contains instructions, referen
 
 ### Subject
 
-The agent performing the test task. Codex, Junie, and Claude are subjects when the harness asks them to use the MiniProject skill.
+The agent performing the test task (the subject of the test). Codex, Junie, and Claude are subjects when the harness asks them to use the MiniProject skill.
 
 ### Harness
 

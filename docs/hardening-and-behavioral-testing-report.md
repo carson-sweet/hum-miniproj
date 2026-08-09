@@ -253,7 +253,7 @@ The total includes contaminated and aborted diagnostic calls, not only the runs 
 
 As of this report, the repository ledger contains 952 recorded calls and $20.9636 of metered cost, plus 172 calls on unpriced models. That is not the all-project cost. Metering was added after substantial earlier activity, Junie text mode does not expose usage, and costs incurred outside the ledger cannot be reconstructed from repository evidence. The ledger therefore must not be presented as a complete spend total.
 
-Separately, the user reported $452.19 of spend during the implementation session, before the bounded human-output hardening phase began. That figure is not derivable or reconcilable from the repository ledger and is therefore reported as an external observation rather than combined into a fabricated all-in total. It is material evidence that the ledger total understates actual project cost.
+Separately, Eigen reported an estimated $452.19 of spend during the design and implementation sessions, before the bounded human-output hardening phase began. That figure is not derivable or reconcilable from the repository ledger and is therefore reported as an external observation rather than combined into a fabricated all-in total. It is material evidence that the ledger total understates actual project cost.
 
 ## Limitations and open risks
 
