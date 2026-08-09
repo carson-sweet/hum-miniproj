@@ -213,8 +213,42 @@ def validate_board(board: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def format_board_result(result: dict[str, Any]) -> str:
+    """Render a board result for a person without adding judgment."""
+    stage = result.get("stage")
+    if result.get("status") == "valid":
+        if stage == "tech_refinement":
+            resolved = int(result.get("resolved") or 0)
+            noun = "card" if resolved == 1 else "cards"
+            return (
+                f"VALID — Tech Refinement resolved {resolved} {noun}. "
+                "The deterministic validator reported no findings."
+            )
+        return (
+            "VALID — Tech Estimation satisfies the measurement rules for every item. "
+            "The deterministic validator reported no findings."
+        )
+
+    status = "INVALID" if result.get("status") == "invalid" else "ERROR"
+    label = {
+        "tech_refinement": "Tech Refinement",
+        "tech_estimation": "Tech Estimation",
+    }.get(stage, "Board validation")
+    findings = result.get("findings") if isinstance(result.get("findings"), list) else []
+    noun = "finding" if len(findings) == 1 else "findings"
+    lines = [f"{status} — {label} reported {len(findings)} {noun}."]
+    for finding in findings:
+        if not isinstance(finding, dict):
+            continue
+        item = finding.get("item") or "board"
+        criterion = finding.get("criterion") or "input"
+        lines.append(f"- {item} / {criterion}: {finding.get('message', 'No detail provided.')}")
+    return "\n".join(lines)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--format", choices=("json", "human"), default="json")
     parser.add_argument("board", type=Path)
     args = parser.parse_args(argv)
     try:
@@ -222,11 +256,12 @@ def main(argv: list[str] | None = None) -> int:
         if not isinstance(data, dict):
             raise ValueError("board JSON must be an object")
     except (OSError, json.JSONDecodeError, ValueError) as exc:
-        print(json.dumps({"schema_version": 1, "status": "error", "findings": [{"code": "invalid-json", "message": str(exc)}]}, indent=2))
+        result = {"schema_version": 1, "status": "error", "findings": [{"code": "invalid-json", "message": str(exc)}]}
+        print(format_board_result(result) if args.format == "human" else json.dumps(result, indent=2))
         return 2
 
     result = validate_board(data)
-    print(json.dumps(result, indent=2))
+    print(format_board_result(result) if args.format == "human" else json.dumps(result, indent=2))
     return {"valid": 0, "invalid": 1}.get(result["status"], 2)
 
 

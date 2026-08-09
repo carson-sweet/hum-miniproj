@@ -50,6 +50,11 @@ artifact, run the corresponding script using its path inside this skill, and use
 its structured findings to revise the artifact. Do not claim that a workflow is
 valid unless the script exits 0.
 
+For every user-facing workflow, pass `--format human` and return that
+human-formatted output as the result. Use the default JSON format only when the
+user explicitly requests machine-readable output or an exact JSON artifact. Do
+not paste raw JSON as the user-facing result.
+
 For a single MiniProject, represent the proposal as JSON:
 
 ```json
@@ -65,14 +70,10 @@ For a single MiniProject, represent the proposal as JSON:
 }
 ```
 
-Run `scripts/validate_bundle.py --format human` and pass the proposal file when
-reporting a result to a person. Treat exit 0 as valid, exit 1 as findings that
-require revision, and exit 2 as invalid input. Use the default JSON format only
-when the user explicitly requests machine-readable output or an exact JSON artifact.
-
-Return the human-formatted output as the result. Do not paste raw JSON as the
-user-facing result, and do not add an answer-quality assessment that the
-deterministic validator did not perform.
+Run `scripts/validate_bundle.py --format human` and pass the proposal file. Treat
+exit 0 as valid, exit 1 as findings that require revision, and exit 2 as invalid
+input. Do not add an answer-quality assessment that the deterministic validator
+did not perform.
 
 The validator checks answer presence and rejects an explicitly technical-layer-only
 boundary. It does not grade whether any other answer is persuasive. If it reports

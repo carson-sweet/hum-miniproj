@@ -1,8 +1,18 @@
+import subprocess
+from pathlib import Path
 import sys
 
 sys.dont_write_bytecode = True
 
-from skills.miniproject.scripts.route_request import route_request, validate_request_route
+from skills.miniproject.scripts.route_request import (
+    format_route_result,
+    route_request,
+    validate_request_route,
+)
+
+
+REPO = Path(__file__).resolve().parents[2]
+SCRIPT = REPO / "skills" / "miniproject" / "scripts" / "route_request.py"
 
 
 def test_us_req_001_routes_specific_widget_request_to_chore_fast_lane():
@@ -63,3 +73,43 @@ def test_us_req_001_does_not_absorb_specific_request_into_a_project():
 
     assert result["status"] == "invalid"
     assert result["findings"][0]["code"] == "specific-request-not-fast-lane"
+
+
+def test_human_result_explains_the_chore_fast_lane():
+    route = route_request("Add the onsite optimization widget to the sales blog")
+
+    assert format_route_result(route) == (
+        "CHORE — Route this specific request through the fast lane. "
+        "Discovery is not required."
+    )
+
+
+def test_human_result_asks_for_the_missing_shaping_owner():
+    route = route_request("Improve onsite optimization")
+
+    assert format_route_result(route) == (
+        "NEEDS INPUT — Send this broad request to shaping. "
+        "Who owns the next shaping step?"
+    )
+
+
+def test_route_cli_can_emit_a_human_readable_deterministic_result():
+    completed = subprocess.run(
+        [
+            "python3",
+            str(SCRIPT),
+            "--format",
+            "human",
+            "Improve onsite optimization",
+            "--owner",
+            "Chelsea",
+        ],
+        text=True,
+        capture_output=True,
+    )
+
+    assert completed.returncode == 0
+    assert completed.stdout.strip() == (
+        "PROJECT — Send this broad request to shaping. Owner: Chelsea. "
+        "Next step: Define explicit in/out scope and create ranked Discovery questions."
+    )

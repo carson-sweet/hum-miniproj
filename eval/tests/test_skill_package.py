@@ -113,7 +113,12 @@ def test_skill_reserves_accountability_for_the_end_to_end_owner():
     assert "do not call a specialist accountable for a technical slice" in text
 
 
-def test_skill_requires_human_readable_validator_reports():
+def test_skill_requires_human_readable_workflow_reports():
     text = " ".join((SKILL / "SKILL.md").read_text().lower().split())
-    assert "--format human" in text
+    assert "every user-facing workflow" in text
     assert "do not paste raw json as the user-facing result" in text
+
+    workflows = " ".join(
+        (SKILL / "references" / "workflows.md").read_text().lower().split()
+    )
+    assert workflows.count("--format human") == 6

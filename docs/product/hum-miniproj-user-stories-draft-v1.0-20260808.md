@@ -1,6 +1,6 @@
 # MiniProject Skill — User Stories
 
-**Version 1.2 (implemented draft) — 2026-08-09**
+**Version 1.3 (implemented draft) — 2026-08-09**
 **Format:** Gherkin (Given/When/Then)
 **Scope:** All personas; SLC subset marked
 **Audience:** Internal (Hum) — engineering handoff and eval-contract input
@@ -44,6 +44,9 @@ in the current package.
 Implementation and executable acceptance paths are machine-checked in
 `eval/user_story_coverage.yaml`. Current deterministic and three-harness acceptance
 evidence is recorded in `spikes/user-story-acceptance/FINDING.md`.
+
+Every interactive workflow reports its deterministic result in plain language.
+Raw JSON is reserved for an explicitly requested machine-readable result or artifact.
 
 ---
 

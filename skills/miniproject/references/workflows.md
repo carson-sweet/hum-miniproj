@@ -28,7 +28,7 @@ explicit frontend, backend, API, data, infrastructure, QA, or testing-only bound
 
 ## Validate a split
 
-Run `scripts/validate_split.py SPLIT.json`. Include at least two complete
+Run `scripts/validate_split.py --format human SPLIT.json`. Include at least two complete
 MiniProjects. Give every bundle a unique `id`, list sibling `dependencies`, and
 leave at least one dependency list empty so one piece can launch independently.
 
@@ -56,7 +56,7 @@ Do not split into frontend, backend, data, infrastructure, or QA bundles.
 
 ## Close Tech Refinement
 
-Run `scripts/validate_board.py BOARD.json` with `stage: tech_refinement`.
+Run `scripts/validate_board.py --format human BOARD.json` with `stage: tech_refinement`.
 Resolve every incoming card exactly once as a named MiniProject, a Chore, or More
 Discovery. Name exactly one owner for each MiniProject. Keep PR sequences, test
 details, implementation detail, and rollout steps out of the board artifact.
@@ -89,7 +89,7 @@ details, implementation detail, and rollout steps out of the board artifact.
 
 ## Check Tech Estimation
 
-Run `scripts/validate_board.py BOARD.json` with `stage: tech_estimation`.
+Run `scripts/validate_board.py --format human BOARD.json` with `stage: tech_estimation`.
 Give every Chore and MiniProject an `effort_estimate`. Give every Discovery item a
 `time_box` and `target_output`; never give it `story_points`, `effort_estimate`,
 `effort_size`, or `delivery_estimate`.
@@ -111,7 +111,7 @@ Give every Chore and MiniProject an `effort_estimate`. Give every Discovery item
 
 ## Shape a broad Project
 
-Run `scripts/validate_discovery_plan.py PLAN.json`. State v1 scope as non-empty
+Run `scripts/validate_discovery_plan.py --format human PLAN.json`. State v1 scope as non-empty
 `in` and `out` lists. Rank every Discovery card, and give each a question, owner,
 and useful output. Do not specify technical bundles. Engineering records its review
 separately; completion requires `accepted` with zero returned cards.
@@ -138,7 +138,7 @@ workflow incomplete until Engineering supplies the review result.
 
 ## Route a work request
 
-Run `scripts/route_request.py REQUEST --owner OWNER`.
+Run `scripts/route_request.py --format human REQUEST --owner OWNER`.
 
 - A specific bounded request becomes a Chore in the fast lane without Discovery.
 - A broad request returns to shaping as a Project with an explicit in/out-scope and

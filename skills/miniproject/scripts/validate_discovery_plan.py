@@ -139,8 +139,33 @@ def validate_discovery_plan(plan: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def format_discovery_plan_result(result: dict[str, Any]) -> str:
+    """Render a Discovery-plan result for a person without adding judgment."""
+    if result.get("status") == "valid":
+        ranked = result.get("ranked_cards") or []
+        noun = "card" if len(ranked) == 1 else "cards"
+        return (
+            f"VALID — The Project has explicit in/out scope, {len(ranked)} ranked "
+            f"Discovery {noun}, and Engineering acceptance with no returned cards. "
+            "The deterministic validator reported no findings."
+        )
+
+    status = "INVALID" if result.get("status") == "invalid" else "ERROR"
+    findings = result.get("findings") if isinstance(result.get("findings"), list) else []
+    noun = "finding" if len(findings) == 1 else "findings"
+    lines = [f"{status} — The deterministic Discovery-plan validator reported {len(findings)} {noun}."]
+    for finding in findings:
+        if not isinstance(finding, dict):
+            continue
+        item = finding.get("item") or "plan"
+        criterion = finding.get("criterion") or "input"
+        lines.append(f"- {item} / {criterion}: {finding.get('message', 'No detail provided.')}")
+    return "\n".join(lines)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--format", choices=("json", "human"), default="json")
     parser.add_argument("plan", type=Path)
     args = parser.parse_args(argv)
     try:
@@ -148,11 +173,12 @@ def main(argv: list[str] | None = None) -> int:
         if not isinstance(data, dict):
             raise ValueError("Discovery plan JSON must be an object")
     except (OSError, json.JSONDecodeError, ValueError) as exc:
-        print(json.dumps({"schema_version": 1, "status": "error", "findings": [{"code": "invalid-json", "message": str(exc)}]}, indent=2))
+        result = {"schema_version": 1, "status": "error", "findings": [{"code": "invalid-json", "message": str(exc)}]}
+        print(format_discovery_plan_result(result) if args.format == "human" else json.dumps(result, indent=2))
         return 2
 
     result = validate_discovery_plan(data)
-    print(json.dumps(result, indent=2))
+    print(format_discovery_plan_result(result) if args.format == "human" else json.dumps(result, indent=2))
     return 0 if result["status"] == "valid" else 1
 
 

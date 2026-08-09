@@ -1,11 +1,14 @@
 # User-story implementation acceptance
 
-**Version 1.1 — 2026-08-09**
+**Version 1.2 — 2026-08-09**
 **Verdict: all eight user stories are implemented; deterministic acceptance passes.**
 
 The first live user test exposed that bundle validation returned raw JSON instead
 of a human-readable result. US-OWN-001 now requires and tests deterministic
-plain-language reporting. A fresh-session user retest remains pending.
+plain-language reporting. Its fresh-session user retest passed. The same reporting
+contract is now implemented and tested for split validation, Tech Refinement, Tech
+Estimation, Discovery-plan validation, and request routing; their live user retests
+remain pending.
 
 ## Story evidence
 
@@ -26,13 +29,13 @@ implementation files and executable acceptance tests.
 
 ## Deterministic acceptance
 
-- 185 tests passed in the final repository-wide run after the human-readable
-  US-OWN-001 reporting correction.
+- 195 tests passed in the final repository-wide run after extending human-readable
+  reporting to every interactive workflow.
 - The story-focused suite passed 40/40 before that correction; the strengthened board
   and Discovery-owner suites then passed 9/9.
 - Portability lint and the standard Agent Skill validator passed.
 
-The 185-test final repository-wide run is the authoritative deterministic total.
+The 195-test final repository-wide run is the authoritative deterministic total.
 
 ## Three-harness acceptance
 

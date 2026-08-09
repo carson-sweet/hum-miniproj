@@ -101,13 +101,34 @@ def validate_request_route(route: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def format_route_result(route: dict[str, Any]) -> str:
+    """Render a request route for a person without adding classification logic."""
+    if route.get("classification") == "chore" and route.get("status") == "routed":
+        return (
+            "CHORE — Route this specific request through the fast lane. "
+            "Discovery is not required."
+        )
+    if route.get("classification") == "project":
+        if route.get("status") == "needs-input":
+            return (
+                "NEEDS INPUT — Send this broad request to shaping. "
+                f"{route.get('question', 'Who owns the next shaping step?')}"
+            )
+        return (
+            "PROJECT — Send this broad request to shaping. "
+            f"Owner: {route.get('owner')}. Next step: {route.get('shaping_step')}"
+        )
+    return "ERROR — The request could not be routed."
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--format", choices=("json", "human"), default="json")
     parser.add_argument("request")
     parser.add_argument("--owner")
     args = parser.parse_args(argv)
     route = route_request(args.request, shaping_owner=args.owner)
-    print(json.dumps(route, indent=2))
+    print(format_route_result(route) if args.format == "human" else json.dumps(route, indent=2))
     return 0 if route["status"] == "routed" else 1
 
 

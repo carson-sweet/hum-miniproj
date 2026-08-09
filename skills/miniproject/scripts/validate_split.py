@@ -5,7 +5,10 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
+import sys
 from typing import Any
+
+sys.dont_write_bytecode = True
 
 try:
     from .validate_bundle import validate_bundle
@@ -19,6 +22,7 @@ def validate_split(proposal: dict[str, Any]) -> dict[str, Any]:
         return {
             "schema_version": 1,
             "status": "invalid",
+            "bundle_count": len(bundles) if isinstance(bundles, list) else 0,
             "independently_launchable": [],
             "findings": [
                 {
@@ -99,13 +103,40 @@ def validate_split(proposal: dict[str, Any]) -> dict[str, Any]:
     return {
         "schema_version": 1,
         "status": "invalid" if findings else "valid",
+        "bundle_count": len(bundles),
         "independently_launchable": independently_launchable,
         "findings": findings,
     }
 
 
+def format_split_result(result: dict[str, Any]) -> str:
+    """Render a split result for a person without changing its meaning."""
+    if result.get("status") == "valid":
+        count = result.get("bundle_count", 0)
+        independent = result.get("independently_launchable") or []
+        names = ", ".join(str(item) for item in independent)
+        return (
+            f"VALID — {count} resulting MiniProjects passed validation. "
+            f"Independently launchable: {names}. "
+            "The deterministic validator reported no findings."
+        )
+
+    status = "INVALID" if result.get("status") == "invalid" else "ERROR"
+    findings = result.get("findings") if isinstance(result.get("findings"), list) else []
+    noun = "finding" if len(findings) == 1 else "findings"
+    lines = [f"{status} — The deterministic split validator reported {len(findings)} {noun}."]
+    for finding in findings:
+        if not isinstance(finding, dict):
+            continue
+        bundle = finding.get("bundle") or "split"
+        criterion = finding.get("criterion") or "input"
+        lines.append(f"- {bundle} / {criterion}: {finding.get('message', 'No detail provided.')}")
+    return "\n".join(lines)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--format", choices=("json", "human"), default="json")
     parser.add_argument("proposal", type=Path)
     args = parser.parse_args(argv)
     try:
@@ -113,11 +144,12 @@ def main(argv: list[str] | None = None) -> int:
         if not isinstance(data, dict):
             raise ValueError("split JSON must be an object")
     except (OSError, json.JSONDecodeError, ValueError) as exc:
-        print(json.dumps({"schema_version": 1, "status": "error", "findings": [{"code": "invalid-json", "message": str(exc)}]}, indent=2))
+        result = {"schema_version": 1, "status": "error", "findings": [{"code": "invalid-json", "message": str(exc)}]}
+        print(format_split_result(result) if args.format == "human" else json.dumps(result, indent=2))
         return 2
 
     result = validate_split(data)
-    print(json.dumps(result, indent=2))
+    print(format_split_result(result) if args.format == "human" else json.dumps(result, indent=2))
     return 0 if result["status"] == "valid" else 1
 
 
