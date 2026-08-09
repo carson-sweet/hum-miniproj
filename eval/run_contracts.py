@@ -42,10 +42,27 @@ LOCAL_ENV = REPO / ".env.local"
 
 ALL_HARNESSES = ("codex", "junie", "claude")
 DETECTION_FLOOR = 0.8
+ALLOWED_SUBJECT_ENV = {"MINIPROJECT_REGISTER", "MINIPROJECT_SOURCE_SESSION"}
 
 
 class BudgetExceeded(RuntimeError):
     """Raised before a subject call would consume the reserved budget."""
+
+
+@contextmanager
+def subject_environment(values: dict[str, str] | None) -> Iterator[None]:
+    """Temporarily expose allowlisted non-secret contract inputs to one subject."""
+    values = values or {}
+    previous = {key: os.environ.get(key) for key in values}
+    try:
+        os.environ.update(values)
+        yield
+    finally:
+        for key, old_value in previous.items():
+            if old_value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = old_value
 
 
 def enforce_metered_budget(
@@ -108,6 +125,15 @@ def validate_contract(data: dict) -> dict:
     negative = data["negative_control"]
     if not isinstance(subject, dict) or not subject.get("fixture") or not subject.get("prompt"):
         raise ValueError(f"{data['id']}: subject requires fixture and prompt")
+    environment = subject.get("environment", {})
+    if not isinstance(environment, dict):
+        raise ValueError(f"{data['id']}: subject.environment must be a mapping")
+    unsafe_environment = set(environment) - ALLOWED_SUBJECT_ENV
+    if unsafe_environment or any(not isinstance(value, str) for value in environment.values()):
+        raise ValueError(
+            f"{data['id']}: subject.environment may contain only "
+            f"{', '.join(sorted(ALLOWED_SUBJECT_ENV))} string values"
+        )
     if not isinstance(assertion, dict) or assertion.get("type") not in {"response", "artifact"}:
         raise ValueError(f"{data['id']}: assert.type must be response or artifact")
     if assertion["type"] == "response" and not assertion.get("pass"):
@@ -242,14 +268,15 @@ def run_one(contract: dict, harness: str, negative: bool, keep: bool) -> Outcome
             shutil.copytree(fixture, work, dirs_exist_ok=True)
             subject = contract["subject"]
             model = select_subject_model(contract, harness)
-            result = driver.run_subject(
-                fixture=work,
-                prompt=subject["prompt"],
-                model=model,
-                writable=subject.get("sandbox") == "workspace-write",
-                timeout_s=subject.get("timeout_s", 180),
-                events_file=work / ".subject.events" if keep else None,
-            )
+            with subject_environment(subject.get("environment")):
+                result = driver.run_subject(
+                    fixture=work,
+                    prompt=subject["prompt"],
+                    model=model,
+                    writable=subject.get("sandbox") == "workspace-write",
+                    timeout_s=subject.get("timeout_s", 180),
+                    events_file=work / ".subject.events" if keep else None,
+                )
 
         if result.exit_code != 0:
             reason = f"subject exit {result.exit_code}: {result.stdout[-500:]}"

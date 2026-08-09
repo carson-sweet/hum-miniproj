@@ -1,4 +1,5 @@
 import json
+import os
 import shutil
 
 import pytest
@@ -16,6 +17,7 @@ from eval.run_contracts import (
     load_contracts,
     select_harnesses,
     select_subject_model,
+    subject_environment,
     validate_contract,
     write_results,
 )
@@ -113,6 +115,48 @@ def test_contract_without_negative_control_is_rejected():
                 "harnesses": list(ALL_HARNESSES),
             }
         )
+
+
+def test_contract_rejects_environment_variables_outside_the_capture_allowlist():
+    with pytest.raises(ValueError, match="environment"):
+        validate_contract(
+            {
+                "id": "MP-X",
+                "name": "unsafe environment",
+                "subject": {
+                    "fixture": "fixtures/p0-2",
+                    "prompt": "x",
+                    "environment": {"ANTHROPIC_API_KEY": "do-not-inject"},
+                },
+                "assert": {"type": "response", "pass": "x"},
+                "negative_control": {
+                    "mutate": {
+                        "file": "SKILL.md",
+                        "op": "replace",
+                        "pattern": "MiniProject",
+                        "value": "LargeProject",
+                    }
+                },
+                "harnesses": list(ALL_HARNESSES),
+            }
+        )
+
+
+def test_subject_environment_is_scoped_and_restored(monkeypatch):
+    monkeypatch.setenv("MINIPROJECT_REGISTER", "before.jsonl")
+    monkeypatch.delenv("MINIPROJECT_SOURCE_SESSION", raising=False)
+
+    with subject_environment(
+        {
+            "MINIPROJECT_REGISTER": "improvement-register.jsonl",
+            "MINIPROJECT_SOURCE_SESSION": "capture-contract-001",
+        }
+    ):
+        assert os.environ["MINIPROJECT_REGISTER"] == "improvement-register.jsonl"
+        assert os.environ["MINIPROJECT_SOURCE_SESSION"] == "capture-contract-001"
+
+    assert os.environ["MINIPROJECT_REGISTER"] == "before.jsonl"
+    assert "MINIPROJECT_SOURCE_SESSION" not in os.environ
 
 
 def test_default_selection_uses_each_contract_claim_and_filter_restricts_it():

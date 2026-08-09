@@ -1,0 +1,55 @@
+id: MP-C16
+name: An approved improvement cycle completes without held-out regression
+stories: [US-IMP-002]
+targets:
+  - references/improvement-loop.md
+  - scripts/analyze_improvements.py
+  - scripts/propose_improvement.py
+  - scripts/record_improvement_approval.py
+  - scripts/record_instruction_version.py
+  - scripts/validate_improvement_cycle.py
+subject:
+  fixture: fixtures/improvement-loop
+  prompt: >-
+    Use the MiniProject skill's improvement-loop workflow on the files in this
+    directory. HUMAN_APPROVAL.txt is the explicit human approval for the exact
+    current.md to candidate.md change. Analyze register.jsonl, prepare the
+    proposal without modifying current.md, record that approval, and record an
+    instruction version with targeted scores improving from 3/5 to 5/5 and
+    held-out scores remaining at 9/10 before and after. Create cycle.json with
+    production_outcome true and run the bundled validator exactly once to write
+    cycle-result.json. Do not revise an input or edit the result in response to
+    the exit status. Then run the bundled validator exactly once against
+    fixed-cycle/cycle.json without modifying any file under fixed-cycle, writing
+    its exact result to fixed-cycle-result.json. A nonzero validator exit still
+    completes the task; do not repair, reconstruct, or overwrite either result.
+  sandbox: workspace-write
+  timeout_s: 300
+  models:
+    claude: sonnet
+assert:
+  type: artifact
+  checks:
+    - kind: exists
+      path: proposal.json
+    - kind: exists
+      path: cycle-result.json
+    - kind: contains
+      path: cycle-result.json
+      pattern: '"status": "valid"'
+    - kind: exists
+      path: fixed-cycle-result.json
+    - kind: contains
+      path: fixed-cycle-result.json
+      pattern: '"status": "valid"'
+    - kind: contains
+      path: current.md
+      pattern: 'Keep technical-layer bundles\.'
+negative_control:
+  expect: FAIL
+  mutate:
+    file: scripts/validate_improvement_cycle.py
+    op: replace
+    pattern: 'if score_rates["held_out"]["after"] < score_rates["held_out"]["before"]:'
+    value: 'if score_rates["held_out"]["after"] <= score_rates["held_out"]["before"]:'
+harnesses: [codex, junie, claude]

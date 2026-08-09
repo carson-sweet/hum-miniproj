@@ -8,6 +8,7 @@ REFERENCES = {
     "bundling-criteria.md",
     "decision-points.md",
     "estimation-policy.md",
+    "improvement-loop.md",
     "workflows.md",
 }
 
@@ -17,6 +18,13 @@ SCRIPTS = {
     "validate_board.py",
     "validate_discovery_plan.py",
     "route_request.py",
+    "register_append.py",
+    "register_verify.py",
+    "analyze_improvements.py",
+    "propose_improvement.py",
+    "record_improvement_approval.py",
+    "record_instruction_version.py",
+    "validate_improvement_cycle.py",
 }
 
 
@@ -27,11 +35,14 @@ def test_skill_contains_the_four_planned_reference_documents():
 
 def test_skill_routes_to_every_reference_and_validator():
     text = (SKILL / "SKILL.md").read_text()
+    routed_text = text + "\n" + "\n".join(
+        path.read_text() for path in (SKILL / "references").glob("*.md")
+    )
 
     for name in REFERENCES:
         assert f"references/{name}" in text
     for name in SCRIPTS:
-        assert f"scripts/{name}" in text
+        assert f"scripts/{name}" in routed_text
 
 
 def test_trigger_description_covers_board_work_and_small_fixes():
@@ -122,3 +133,24 @@ def test_skill_requires_human_readable_workflow_reports():
         (SKILL / "references" / "workflows.md").read_text().lower().split()
     )
     assert workflows.count("--format human") == 6
+
+
+def test_skill_routes_capture_and_human_approved_improvement_cycles():
+    text = " ".join((SKILL / "SKILL.md").read_text().lower().split())
+    reference = " ".join(
+        (SKILL / "references" / "improvement-loop.md").read_text().lower().split()
+    )
+
+    assert "capture an improvement learning" in text
+    assert "references/improvement-loop.md" in text
+    assert "never apply" in reference
+    assert "explicit human approval" in reference
+    assert "held-out" in reference
+
+
+def test_capture_failure_cannot_be_bypassed_with_another_writer():
+    text = " ".join((SKILL / "SKILL.md").read_text().lower().split())
+
+    assert "never create, edit, repair, or append to the register" in text
+    assert "shell redirection" in text
+    assert "report capture failure" in text

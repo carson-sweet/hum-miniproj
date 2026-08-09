@@ -1,0 +1,2 @@
+{"id":"lr-e000000000000001","date":"2026-08-09","harness":"codex","skill":"SKILL.md","type":"correction","learning":"Reject technical-layer-only bundles.","source_session":"live:cycle-1","weight":1.0}
+{"id":"lr-e000000000000002","date":"2026-08-09","harness":"junie","skill":"SKILL.md","type":"correction","learning":"A bundle must deliver an end-to-end improvement.","source_session":"live:cycle-2","weight":1.0}

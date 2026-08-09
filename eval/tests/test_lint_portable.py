@@ -89,6 +89,14 @@ def test_allows_compatible_spdx_identifier(portable_skill):
     assert lint_skill(portable_skill) == []
 
 
+def test_ignores_python_runtime_cache_files(portable_skill):
+    cache = portable_skill / "scripts" / "__pycache__"
+    cache.mkdir()
+    (cache / "check.cpython-311.pyc").write_bytes(b"\xff\x00runtime cache")
+
+    assert lint_skill(portable_skill) == []
+
+
 def test_missing_skill_file_is_named(tmp_path):
     violations = lint_skill(tmp_path)
     assert codes(violations) == {"missing-skill-file"}

@@ -1,6 +1,6 @@
 # MiniProject Skill — User Stories
 
-**Version 1.3 (implemented draft) — 2026-08-09**
+**Version 1.4 (implemented draft) — 2026-08-09**
 **Format:** Gherkin (Given/When/Then)
 **Scope:** All personas; SLC subset marked
 **Audience:** Internal (Hum) — engineering handoff and eval-contract input
@@ -27,7 +27,7 @@ without leaving your editor, whether it is a real MiniProject — and if it is n
 which criterion is unanswered.*
 
 SLC v1 is **US-OWN-001 through US-OWN-004**. Those four completely deliver that promise to
-one persona. The other four stories remain outside the SLC promise but are also implemented
+one persona. The other six stories remain outside the SLC promise but are also implemented
 in the current package.
 
 | Story | Persona | In SLC v1 | Implemented |
@@ -40,6 +40,8 @@ in the current package.
 | US-FAC-002 | Refinement Facilitator | — | ✅ |
 | US-VAL-001 | Value Definer | — | ✅ |
 | US-REQ-001 | Work Requester | — | ✅ |
+| US-IMP-001 | Refinement Facilitator | — | ✅ |
+| US-IMP-002 | Refinement Facilitator | — | ✅ |
 
 Implementation and executable acceptance paths are machine-checked in
 `eval/user_story_coverage.yaml`. Current deterministic and three-harness acceptance
@@ -262,6 +264,59 @@ Scenario: Negative control — silence on a broad ask
 
 ---
 
+## Continuous Improvement
+
+### US-IMP-001: Capture a learning from live use
+
+As a Refinement Facilitator
+I want each completed workflow to leave one verified procedural learning
+So that corrections and preferences survive beyond the session where they appeared
+
+```gherkin
+Scenario: A completed workflow captures one live learning
+  Given a MiniProject workflow completed in a supported harness
+  When its closeout runs
+  Then register_append.py writes a schema-valid correction, preference, pattern, or confirmation
+  And register_verify.py confirms an entry from that session
+
+Scenario: Seed entries do not impersonate live use
+  Given the register contains only the human-curated seed corpus
+  When live-capture verification runs
+  Then verification fails
+
+Scenario: Negative control — capture is disabled
+  Given the only register writer discards the closeout entry
+  When a full workflow completes
+  Then the artifact contract reports that the register did not grow
+```
+
+### US-IMP-002: Improve instructions without self-applying or overfitting
+
+As a Refinement Facilitator
+I want recurring learnings converted into measured, reversible proposals
+So that the workflow improves without silently changing itself or sacrificing unrelated behavior
+
+```gherkin
+Scenario: A known pattern becomes an approved measured proposal
+  Given recurring schema-valid register entries and a separate candidate instruction
+  When the improvement loop runs
+  Then it recovers the pattern and produces forward and reverse diffs without changing the instruction
+  And it continues only after explicit human approval of that exact proposal
+  And the new targeted contract includes a negative control
+
+Scenario: A production outcome receives an artifact contract
+  Given the proposed improvement concerns an outcome in produced work
+  When the cycle is validated
+  Then its targeted contract asserts on an artifact rather than response prose
+
+Scenario: Negative control — targeted gain hides held-out regression
+  Given the targeted score improves but the held-out score falls
+  When the cycle validator runs
+  Then the cycle is invalid and the instruction version is not confirmed
+```
+
+---
+
 ## Deliberate deviation from the skill template
 
 `sweetclaude:product-user-stories` specifies per-story files at
@@ -277,9 +332,9 @@ roadmap cache on every rebuild. Stories live in this document until they are pro
 
 1. **Success thresholds are unmeasured.** "Under 5 minutes" (personas doc) and "zero cards
    returned" are plausible targets, not observed baselines.
-2. **No stories for the improvement loop** (MS-005, MS-006). Deliberate — the plan gates
-   those on P0.3 and on capture producing live entries.
-3. **Negative controls are declared but the new story contracts are not hardened.** Each
+2. **Improvement capture still depends on closeout behavior.** The verifier detects a miss,
+   but the Agent Skills standard still has no lifecycle hook that can force closeout.
+3. **Negative controls are declared but the newest story contracts are not hardened.** Each
    has a mutation; repeated mutation qualification is deliberately deferred until after
    user testing.
 4. **Request classification uses a deliberately small deterministic boundary.** Specific
@@ -292,5 +347,7 @@ roadmap cache on every rebuild. Stories live in this document until they are pro
 
 | Version | Date       | Change summary                                        |
 |---------|------------|-------------------------------------------------------|
+| 1.4     | 2026-08-09 | Added implemented capture and improvement-loop stories. |
+| 1.3     | 2026-08-09 | Hardened plain-language output across six workflows.  |
 | 1.1     | 2026-08-09 | Implemented all stories with executable acceptance.   |
 | 1.0     | 2026-08-08 | Initial draft. 8 stories, Gherkin, SLC subset marked.  |
