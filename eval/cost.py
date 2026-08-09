@@ -101,9 +101,12 @@ def cost_usd(usage: Usage, model: str) -> float | None:
 
 
 def record(*, role: str, model: str, usage: Usage, harness: str = "codex",
-           label: str = "", ledger: Path | None = None) -> float | None:
+           label: str = "", ledger: Path | None = None,
+           cost_override: float | None = None,
+           run_id: str | None = None) -> float | None:
     """Append one metered call to the ledger. Returns its cost."""
-    dollars = cost_usd(usage, model)
+    estimated = cost_usd(usage, model)
+    dollars = round(cost_override, 6) if cost_override is not None else estimated
     path = ledger or LEDGER
     path.parent.mkdir(parents=True, exist_ok=True)
     row = {
@@ -112,15 +115,50 @@ def record(*, role: str, model: str, usage: Usage, harness: str = "codex",
         "harness": harness,
         "model": model,
         "label": label,
+        "run_id": run_id or os.environ.get("EVAL_RUN_ID"),
         **asdict(usage),
         "cost_usd": dollars,
+        "cost_source": "provider" if cost_override is not None else (
+            "estimate" if estimated is not None else "unpriced"
+        ),
     }
     with path.open("a") as fh:
         fh.write(json.dumps(row) + "\n")
     return dollars
 
 
-def totals(ledger: Path | None = None, since: str | None = None) -> dict:
+def record_unmetered(
+    *,
+    role: str,
+    model: str,
+    harness: str,
+    label: str = "",
+    ledger: Path | None = None,
+    run_id: str | None = None,
+) -> None:
+    """Record a real call whose provider surface exposes no usage data."""
+    path = ledger or LEDGER
+    path.parent.mkdir(parents=True, exist_ok=True)
+    row = {
+        "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "role": role,
+        "harness": harness,
+        "model": model,
+        "label": label,
+        "run_id": run_id or os.environ.get("EVAL_RUN_ID"),
+        **asdict(Usage()),
+        "cost_usd": None,
+        "cost_source": "unavailable",
+    }
+    with path.open("a") as fh:
+        fh.write(json.dumps(row) + "\n")
+
+
+def totals(
+    ledger: Path | None = None,
+    since: str | None = None,
+    run_id: str | None = None,
+) -> dict:
     path = ledger or LEDGER
     if not path.exists():
         return {"calls": 0, "cost_usd": 0.0, "unpriced_calls": 0, "by_model": {}}
@@ -133,6 +171,8 @@ def totals(ledger: Path | None = None, since: str | None = None) -> dict:
         except json.JSONDecodeError:
             continue
         if since and row.get("ts", "") < since:
+            continue
+        if run_id and row.get("run_id") != run_id:
             continue
         calls += 1
         m = by_model.setdefault(row.get("model", "?"),

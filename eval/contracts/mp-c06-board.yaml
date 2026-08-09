@@ -1,0 +1,45 @@
+id: MP-C06
+name: Refinement closes every card and estimation applies the correct measure
+stories: [US-FAC-001, US-FAC-002]
+targets:
+  - SKILL.md
+  - references/workflows.md
+  - references/estimation-policy.md
+  - scripts/validate_board.py
+subject:
+  fixture: fixtures/p0-2
+  prompt: >-
+    Use the MiniProject skill to create two board artifacts and validate both.
+    refinement-board.json is a Tech Refinement board with exactly five resolved
+    cards: two named MiniProjects with one owner each, two named Chores, and one
+    More Discovery result with an owner and next question. Put no PR sequence,
+    implementation detail, test detail, or rollout steps on the board. Save the
+    exact validator output as refinement-result.json. estimation-board.json has a
+    Chore and MiniProject with effort_estimate values plus a Discovery with a
+    time_box and target_output and no effort or story points. Save its exact
+    validator output as estimation-result.json. Do the work, including running the
+    bundled board validator twice; do not merely describe it.
+  sandbox: workspace-write
+  timeout_s: 300
+  models:
+    claude: sonnet
+assert:
+  type: artifact
+  checks:
+    - kind: contains
+      path: refinement-result.json
+      pattern: '"status": "valid"'
+    - kind: contains
+      path: refinement-result.json
+      pattern: '"resolved": 5'
+    - kind: contains
+      path: estimation-result.json
+      pattern: '"status": "valid"'
+negative_control:
+  expect: FAIL
+  mutate:
+    file: scripts/validate_board.py
+    op: replace
+    pattern: 'if any(_present(item.get(key)) for key in ESTIMATE_KEYS):'
+    value: 'if True:'
+harnesses: [codex, junie, claude]

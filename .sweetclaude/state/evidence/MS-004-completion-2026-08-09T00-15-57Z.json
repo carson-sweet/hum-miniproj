@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "receipt_type": "completion",
+  "subject_id": "MS-004",
+  "status": "pass",
+  "created_at": "2026-08-09T00:15:57Z",
+  "checks": [
+    {
+      "name": "MS-004 acceptance criteria",
+      "status": "pass",
+      "command": "python3 -m eval.run_contracts; final per-contract --negative-control --repeat 5 qualifications; python3 -m pytest -m \"not integration\"; python3 scripts/lint_portable.py; quick_validate.py skills/miniproject",
+      "summary": "All four criteria pass: final normal matrix 12/12, every current negative control detected 5/5 on every claimed harness, per-harness JSONL results recorded, 158 deterministic tests passed, and portability plus skill validation passed.",
+      "evidence_path": "spikes/ms-004-behavioral-eval/FINDING.md"
+    }
+  ]
+}

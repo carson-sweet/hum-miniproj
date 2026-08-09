@@ -1,25 +1,61 @@
 id: MP-C01
-name: Discovery is time-boxed, never estimated
-targets: SKILL.md
+name: Inconclusive Discovery produces a paste-ready More Discovery record
+targets:
+  - SKILL.md
+  - references/work-types.md
 subject:
   fixture: fixtures/p0-2
   prompt: >-
-    We have a Discovery card: work out the technical path for reading and running
-    customer sites. What estimate should it carry going into sprint planning?
-  sandbox: read-only
+    The time box for our SSO Discovery item ended. We confirmed the vendor supports
+    SAML, but tenant-to-organization mapping is still unresolved and blocks shaping
+    delivery work. Use the MiniProject skill and write the paste-ready closing record
+    to discovery-decision.md, including its labeled terminal outcome, what was
+    learned, and the next question. Do the work; do not merely explain what somebody
+    else should record.
+  sandbox: workspace-write
   timeout_s: 180
+  models:
+    claude: sonnet
 assert:
-  type: response
-  pass: >-
-    The response declines to give an effort estimate for the Discovery item.
-    It either time-boxes the work to a decision, approach, or next step, or it
-    states plainly that Discovery is not estimated the way implementation is.
-    Assigning story points, an effort size, or a work estimate to the Discovery
-    item fails.
+  type: artifact
+  checks:
+    - kind: exists
+      path: discovery-decision.md
+    - kind: contains
+      path: discovery-decision.md
+      pattern: '(?i)more discovery'
+    - kind: contains
+      path: discovery-decision.md
+      pattern: '(?i)SAML'
+    - kind: contains
+      path: discovery-decision.md
+      pattern: '(?i)tenant-to-organization mapping'
 negative_control:
   expect: FAIL
   mutate:
-    file: SKILL.md
-    op: delete_lines_matching
-    pattern: '^RULE-EST:'
-harnesses: [codex]
+    - file: SKILL.md
+      op: replace
+      pattern: |-
+        terminal outcome. Do not provide an implementation estimate: no story points,
+             effort size, or delivery estimate, even alongside a time box.
+      value: |-
+        terminal outcome. Close Discovery as shipped work without a decision artifact.
+    - file: references/work-types.md
+      op: replace
+      pattern: '2. **More Discovery** is required, with the next question stated.'
+      value: '2. **Keep open** until every uncertainty is eliminated.'
+    - file: SKILL.md
+      op: replace
+      pattern: |-
+        Use exactly one terminal label: Ready to shape, More Discovery, or Stop; do
+             not invent a synonym such as Inconclusive.
+      value: |-
+        Use any descriptive terminal label, including Inconclusive.
+    - file: references/work-types.md
+      op: replace
+      pattern: |-
+        Its completion evidence is the decision artifact and terminal
+        outcome, not shipped code.
+      value: |-
+        Its completion evidence is shipped code; no decision artifact is required.
+harnesses: [codex, junie, claude]

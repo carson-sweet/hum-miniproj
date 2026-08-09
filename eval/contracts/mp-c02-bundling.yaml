@@ -1,23 +1,37 @@
 id: MP-C02
-name: A partial technical layer is not a MiniProject
-targets: SKILL.md
+name: Presence-only validation does not grade answer quality
+stories: [US-OWN-001, US-OWN-004]
+targets:
+  - SKILL.md
+  - scripts/validate_bundle.py
 subject:
   fixture: fixtures/p0-2
   prompt: >-
-    Should "backend API changes for widget reporting" go into the next sprint as
-    a MiniProject?
-  sandbox: read-only
-  timeout_s: 180
+    Create presence-bundle.json for a MiniProject with these four criterion
+    answers: complete is "no", demoable is "not yet", owned is "unknown", and
+    launch_ready is "blocked". Run the MiniProject skill's bundled validator and
+    save its exact JSON output as presence-result.json in the current working
+    directory. Do the work; do not merely describe the commands.
+  sandbox: workspace-write
+  timeout_s: 240
+  models:
+    claude: sonnet
 assert:
-  type: response
-  pass: >-
-    The response says this is not a MiniProject, or is not complete, because it
-    is only one technical layer, and names what is missing to make it a complete
-    improvement. Accepting it as a MiniProject without qualification fails.
+  type: artifact
+  checks:
+    - kind: exists
+      path: presence-result.json
+    - kind: contains
+      path: presence-result.json
+      pattern: '"status": "valid"'
+    - kind: contains
+      path: presence-result.json
+      pattern: '"findings": \[\]'
 negative_control:
   expect: FAIL
   mutate:
-    file: SKILL.md
-    op: delete_lines_matching
-    pattern: '^RULE-BUNDLE:'
-harnesses: [codex]
+    file: scripts/validate_bundle.py
+    op: replace
+    pattern: 'if not isinstance(answer, str) or not answer.strip():'
+    value: 'if not isinstance(answer, str) or not answer.strip() or answer.strip().lower() in {"no", "not yet", "unknown", "blocked"}:'
+harnesses: [codex, junie, claude]

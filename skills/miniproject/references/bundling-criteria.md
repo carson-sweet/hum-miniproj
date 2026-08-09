@@ -21,6 +21,9 @@ Question: How will someone see the improvement work?
 
 Name one owner for the end-to-end result. The owner may coordinate reviews and
 specialist input, but responsibility does not fragment by technical layer.
+Contributors may implement or review parts of the work, but they do not own
+technical-layer slices inside the MiniProject. The one owner remains accountable
+for integration, verification, and release readiness.
 
 Question: Who carries the improvement through implementation, verification, and
 release readiness?
@@ -45,6 +48,6 @@ are implementation concerns inside the owner's plan.
 ## Validator boundary
 
 `validate_bundle.py` is intentionally mechanical. It reports missing or blank
-answers in a stable JSON shape. It does not decide whether an answer is persuasive,
-whether the scope is too large, or whether the work is genuinely complete. Apply
-human or agent judgment after the presence check.
+answers and explicit technical-layer-only boundaries in a stable JSON shape. It
+does not decide whether any other answer is persuasive or whether the scope is too
+large. Apply human or agent judgment after the mechanical checks.

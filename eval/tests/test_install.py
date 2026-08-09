@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 import subprocess
 
 from scripts.lint_portable import lint_skill
@@ -42,6 +43,34 @@ def test_install_creates_canonical_copy_and_three_harness_links(tmp_path):
     for link in links:
         assert link.is_symlink(), f"missing harness link: {link}"
         assert link.resolve() == canonical.resolve()
+
+
+def test_us_own_004_installed_validator_returns_identical_findings_in_every_harness(tmp_path):
+    home = tmp_path / "home"
+    assert run_installer(home).returncode == 0
+    _, links = installed_paths(home)
+    proposal = tmp_path / "bundle.json"
+    proposal.write_text(
+        json.dumps(
+            {
+                "work_type": "miniproject",
+                "name": "Backend API changes for widget reporting",
+                "criteria": {"complete": "Backend endpoints are implemented."},
+            }
+        )
+    )
+
+    results = []
+    for harness_skill in links:
+        completed = subprocess.run(
+            ["python3", str(harness_skill / "scripts" / "validate_bundle.py"), str(proposal)],
+            text=True,
+            capture_output=True,
+        )
+        assert completed.returncode == 1, completed.stderr
+        results.append(json.loads(completed.stdout))
+
+    assert results[0] == results[1] == results[2]
 
 
 def test_install_is_idempotent(tmp_path):

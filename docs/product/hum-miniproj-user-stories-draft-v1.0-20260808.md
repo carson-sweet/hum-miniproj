@@ -1,6 +1,6 @@
 # MiniProject Skill — User Stories
 
-**Version 1.0 (draft) — 2026-08-08**
+**Version 1.3 (implemented draft) — 2026-08-09**
 **Format:** Gherkin (Given/When/Then)
 **Scope:** All personas; SLC subset marked
 **Audience:** Internal (Hum) — engineering handoff and eval-contract input
@@ -27,18 +27,26 @@ without leaving your editor, whether it is a real MiniProject — and if it is n
 which criterion is unanswered.*
 
 SLC v1 is **US-OWN-001 through US-OWN-004**. Those four completely deliver that promise to
-one persona. Everything below them is real, ranked, and deliberately not v1.
+one persona. The other four stories remain outside the SLC promise but are also implemented
+in the current package.
 
-| Story | Persona | In SLC v1 | Milestone |
-|-------|---------|-----------|-----------|
-| US-OWN-001 | MiniProject Owner | ✅ | MS-003 |
-| US-OWN-002 | MiniProject Owner | ✅ | MS-003 |
-| US-OWN-003 | MiniProject Owner | ✅ | MS-003 |
-| US-OWN-004 | MiniProject Owner | ✅ | MS-002 |
-| US-FAC-001 | Refinement Facilitator | — | MS-003 |
-| US-FAC-002 | Refinement Facilitator | — | MS-003 |
-| US-VAL-001 | Value Definer | — | post-MS-003 |
-| US-REQ-001 | Work Requester | — | post-MS-003 |
+| Story | Persona | In SLC v1 | Implemented |
+|-------|---------|-----------|-------------|
+| US-OWN-001 | MiniProject Owner | ✅ | ✅ |
+| US-OWN-002 | MiniProject Owner | ✅ | ✅ |
+| US-OWN-003 | MiniProject Owner | ✅ | ✅ |
+| US-OWN-004 | MiniProject Owner | ✅ | ✅ |
+| US-FAC-001 | Refinement Facilitator | — | ✅ |
+| US-FAC-002 | Refinement Facilitator | — | ✅ |
+| US-VAL-001 | Value Definer | — | ✅ |
+| US-REQ-001 | Work Requester | — | ✅ |
+
+Implementation and executable acceptance paths are machine-checked in
+`eval/user_story_coverage.yaml`. Current deterministic and three-harness acceptance
+evidence is recorded in `spikes/user-story-acceptance/FINDING.md`.
+
+Every interactive workflow reports its deterministic result in plain language.
+Raw JSON is reserved for an explicitly requested machine-readable result or artifact.
 
 ---
 
@@ -54,7 +62,7 @@ So that I do not commit to owning a technical layer wearing a MiniProject label
 Scenario: All four criteria have stated answers
   Given a proposed bundle with a stated answer for each of the four criteria
   When I run the bundle validator
-  Then it reports no findings
+  Then it reports in plain language that the result is valid and has no findings
   And it does not comment on the quality of any answer
 
 Scenario: A criterion has no stated answer
@@ -271,10 +279,12 @@ roadmap cache on every rebuild. Stories live in this document until they are pro
    returned" are plausible targets, not observed baselines.
 2. **No stories for the improvement loop** (MS-005, MS-006). Deliberate — the plan gates
    those on P0.3 and on capture producing live entries.
-3. **Negative controls here are sketched, not specified.** Phase 3 turns each into a
-   declared mutation with an expected failure.
-4. **US-VAL-001 and US-REQ-001 assume a classifier** that the plan does not yet scope.
-   They may become Discovery rather than implementation.
+3. **Negative controls are declared but the new story contracts are not hardened.** Each
+   has a mutation; repeated mutation qualification is deliberately deferred until after
+   user testing.
+4. **Request classification uses a deliberately small deterministic boundary.** Specific
+   and broad examples in US-REQ-001 are covered; additional language belongs in user-led
+   hardening rather than being guessed now.
 
 ---
 
@@ -282,4 +292,5 @@ roadmap cache on every rebuild. Stories live in this document until they are pro
 
 | Version | Date       | Change summary                                        |
 |---------|------------|-------------------------------------------------------|
+| 1.1     | 2026-08-09 | Implemented all stories with executable acceptance.   |
 | 1.0     | 2026-08-08 | Initial draft. 8 stories, Gherkin, SLC subset marked.  |

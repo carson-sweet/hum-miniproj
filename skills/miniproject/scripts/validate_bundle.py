@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
+import re
 from typing import Any
 
 
@@ -14,6 +15,19 @@ CRITERIA = {
     "owned": "State who will own the work end to end.",
     "launch_ready": "State what will make the improvement safe to launch.",
 }
+
+TECHNICAL_LAYER_ONLY = re.compile(
+    r"(?:^|\b)(?:only\s+)?(?:the\s+)?"
+    r"(?:frontend|backend|api|database|data(?:\s+layer)?|infrastructure|qa|testing?)"
+    r"\s+(?:work|changes?|tasks?|endpoints?|components?|migration|layer)(?:\b|$)",
+    re.IGNORECASE,
+)
+
+
+def is_technical_layer_only(bundle: dict[str, Any], complete_answer: str) -> bool:
+    """Detect an explicit technical-layer boundary without grading answer quality."""
+    name = str(bundle.get("name") or "")
+    return bool(TECHNICAL_LAYER_ONLY.search(name) or TECHNICAL_LAYER_ONLY.search(complete_answer))
 
 
 def validate_bundle(bundle: dict[str, Any]) -> dict[str, Any]:
@@ -60,6 +74,24 @@ def validate_bundle(bundle: dict[str, Any]) -> dict[str, Any]:
                 }
             )
 
+    complete_answer = answers.get("complete")
+    if (
+        isinstance(complete_answer, str)
+        and complete_answer.strip()
+        and is_technical_layer_only(bundle, complete_answer)
+    ):
+        findings.append(
+            {
+                "criterion": "complete",
+                "code": "technical-layer-only",
+                "message": (
+                    "Name a complete behavior or operational improvement, not a "
+                    "frontend, backend, data, infrastructure, testing, or other "
+                    "technical-layer slice."
+                ),
+            }
+        )
+
     return {
         "schema_version": 1,
         "work_type": "miniproject",
@@ -69,8 +101,42 @@ def validate_bundle(bundle: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def format_bundle_result(result: dict[str, Any]) -> str:
+    """Render the deterministic result for a person without adding judgment."""
+    status = result.get("status")
+    if status == "valid":
+        return (
+            "VALID — All four required MiniProject criteria have stated answers. "
+            "The deterministic validator reported no findings. "
+            "Answer quality was not assessed."
+        )
+    if status == "bypass":
+        return f"BYPASS — {result.get('message', 'Bundle validation was not required.')}"
+
+    findings = result.get("findings")
+    if not isinstance(findings, list):
+        findings = []
+    label = "INVALID" if status == "invalid" else "ERROR"
+    count = len(findings)
+    noun = "finding" if count == 1 else "findings"
+    lines = [f"{label} — The deterministic validator reported {count} {noun}."]
+    for finding in findings:
+        if not isinstance(finding, dict):
+            continue
+        criterion = finding.get("criterion", "input")
+        message = finding.get("message", "No detail provided.")
+        lines.append(f"- {criterion}: {message}")
+    return "\n".join(lines)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--format",
+        choices=("json", "human"),
+        default="json",
+        help="output format (default: json)",
+    )
     parser.add_argument("bundle", type=Path, help="JSON bundle proposal")
     args = parser.parse_args(argv)
 
@@ -92,11 +158,17 @@ def main(argv: list[str] | None = None) -> int:
                 }
             ],
         }
-        print(json.dumps(result, indent=2))
+        if args.format == "human":
+            print(format_bundle_result(result))
+        else:
+            print(json.dumps(result, indent=2))
         return 2
 
     result = validate_bundle(data)
-    print(json.dumps(result, indent=2))
+    if args.format == "human":
+        print(format_bundle_result(result))
+    else:
+        print(json.dumps(result, indent=2))
     return {"valid": 0, "bypass": 0, "invalid": 1}.get(result["status"], 2)
 
 

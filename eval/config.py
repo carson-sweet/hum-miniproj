@@ -12,3 +12,10 @@ import os
 
 SUBJECT_MODEL = os.environ.get("EVAL_SUBJECT_MODEL", "gpt-5.6-luna")
 JUDGE_MODEL = os.environ.get("EVAL_JUDGE_MODEL", "gpt-5.6-luna")
+
+
+def subject_model(harness: str) -> str:
+    """Return a harness-valid weak subject model."""
+    if harness == "claude":
+        return os.environ.get("EVAL_CLAUDE_SUBJECT_MODEL", "haiku")
+    return SUBJECT_MODEL

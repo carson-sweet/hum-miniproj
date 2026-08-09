@@ -4,7 +4,15 @@ import json
 import pytest
 
 from eval import cost
-from eval.cost import Usage, cost_usd, format_totals, parse_usage, record, totals
+from eval.cost import (
+    Usage,
+    cost_usd,
+    format_totals,
+    parse_usage,
+    record,
+    record_unmetered,
+    totals,
+)
 
 REAL_EVENTS = (
     '{"type":"thread.started","thread_id":"019fe1"}\n'
@@ -97,3 +105,43 @@ def test_ledger_rows_are_valid_json_with_cost(tmp_path):
     assert row["label"] == "fixture-x"
     assert row["input_tokens"] == 12640
     assert isinstance(row["cost_usd"], float)
+
+
+def test_provider_reported_cost_overrides_price_estimate(tmp_path):
+    led = tmp_path / "ledger.jsonl"
+    record(
+        role="subject",
+        model="provider-routed-model",
+        usage=Usage(input_tokens=100, output_tokens=10),
+        ledger=led,
+        cost_override=0.0042,
+    )
+    row = json.loads(led.read_text())
+    assert row["cost_usd"] == 0.0042
+    assert row["cost_source"] == "provider"
+
+
+def test_unavailable_usage_is_flagged_not_reported_as_zero_cost(tmp_path):
+    led = tmp_path / "ledger.jsonl"
+    record_unmetered(
+        role="subject", model="gpt-5.6-luna", harness="junie", ledger=led
+    )
+    row = json.loads(led.read_text())
+    assert row["cost_usd"] is None
+    assert row["cost_source"] == "unavailable"
+    assert totals(ledger=led)["unpriced_calls"] == 1
+
+
+def test_totals_can_be_scoped_to_one_parallel_run(tmp_path):
+    led = tmp_path / "ledger.jsonl"
+    record(
+        role="subject", model="gpt-5.6-luna", usage=Usage(input_tokens=100),
+        ledger=led, run_id="run-a",
+    )
+    record(
+        role="subject", model="gpt-5.6-luna", usage=Usage(input_tokens=200),
+        ledger=led, run_id="run-b",
+    )
+    scoped = totals(ledger=led, run_id="run-a")
+    assert scoped["calls"] == 1
+    assert scoped["by_model"]["gpt-5.6-luna"]["input"] == 100

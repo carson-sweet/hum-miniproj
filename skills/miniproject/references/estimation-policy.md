@@ -17,8 +17,10 @@ those changes into separately estimated board items.
 
 Set a time box instead of an implementation estimate. The commitment is to produce
 the named decision artifact and terminal outcome within that investment boundary.
-If more Discovery is required, state the next question and set a new explicit time
-box rather than silently extending the work.
+Do not add story points, an effort size, or a delivery estimate alongside a time box;
+the time box is the investment limit, not a second estimate. If more Discovery is
+required, state the next question and set a new explicit time box rather than
+silently extending the work.
 
 ## Project
 

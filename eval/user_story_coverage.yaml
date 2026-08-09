@@ -1,0 +1,55 @@
+US-OWN-001:
+  status: implemented
+  implementation:
+    - skills/miniproject/scripts/validate_bundle.py
+  acceptance_tests:
+    - eval/tests/test_validate_bundle.py
+US-OWN-002:
+  status: implemented
+  implementation:
+    - skills/miniproject/scripts/validate_bundle.py
+    - skills/miniproject/references/bundling-criteria.md
+  acceptance_tests:
+    - eval/tests/test_validate_bundle.py
+US-OWN-003:
+  status: implemented
+  implementation:
+    - skills/miniproject/scripts/validate_split.py
+    - skills/miniproject/references/workflows.md
+  acceptance_tests:
+    - eval/tests/test_validate_split.py
+US-OWN-004:
+  status: implemented
+  implementation:
+    - install.sh
+    - skills/miniproject/scripts/validate_bundle.py
+  acceptance_tests:
+    - eval/tests/test_install.py
+US-FAC-001:
+  status: implemented
+  implementation:
+    - skills/miniproject/scripts/validate_board.py
+    - skills/miniproject/references/workflows.md
+  acceptance_tests:
+    - eval/tests/test_validate_board.py
+US-FAC-002:
+  status: implemented
+  implementation:
+    - skills/miniproject/scripts/validate_board.py
+    - skills/miniproject/references/estimation-policy.md
+  acceptance_tests:
+    - eval/tests/test_validate_board.py
+US-VAL-001:
+  status: implemented
+  implementation:
+    - skills/miniproject/scripts/validate_discovery_plan.py
+    - skills/miniproject/references/workflows.md
+  acceptance_tests:
+    - eval/tests/test_validate_discovery_plan.py
+US-REQ-001:
+  status: implemented
+  implementation:
+    - skills/miniproject/scripts/route_request.py
+    - skills/miniproject/references/workflows.md
+  acceptance_tests:
+    - eval/tests/test_route_request.py

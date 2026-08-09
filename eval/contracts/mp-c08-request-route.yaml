@@ -1,0 +1,45 @@
+id: MP-C08
+name: Specific requests use the fast lane and broad requests return to shaping
+stories: [US-REQ-001]
+targets:
+  - SKILL.md
+  - references/workflows.md
+  - scripts/route_request.py
+subject:
+  fixture: fixtures/p0-2
+  prompt: >-
+    Use the MiniProject skill's bundled request router twice. Route "Add the onsite
+    optimization widget to the sales blog" and save the exact JSON output as
+    specific-route.json. Route "Improve onsite optimization" with shaping owner
+    Chelsea and save the exact JSON output as broad-route.json. Do the work by
+    running the script; do not merely describe the expected routes.
+  sandbox: workspace-write
+  timeout_s: 180
+  models:
+    claude: sonnet
+assert:
+  type: artifact
+  checks:
+    - kind: contains
+      path: specific-route.json
+      pattern: '"classification": "chore"'
+    - kind: contains
+      path: specific-route.json
+      pattern: '"lane": "fast"'
+    - kind: contains
+      path: broad-route.json
+      pattern: '"classification": "project"'
+    - kind: contains
+      path: broad-route.json
+      pattern: '"lane": "shaping"'
+    - kind: contains
+      path: broad-route.json
+      pattern: '"owner": "Chelsea"'
+negative_control:
+  expect: FAIL
+  mutate:
+    file: scripts/route_request.py
+    op: replace
+    pattern: 'if is_specific_request(request):'
+    value: 'if False and is_specific_request(request):'
+harnesses: [codex, junie, claude]

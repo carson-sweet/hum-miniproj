@@ -7,8 +7,9 @@ complete improvement rather than by technical layer.
 Runs anywhere the Agent Skills standard is supported: Claude Code, Codex, Junie,
 and others.
 
-**Status:** Phase 0 and the portable substrate are complete. The MiniProject
-behavior itself is not built yet.
+**Status:** All eight product user stories are implemented with deterministic and
+three-harness acceptance coverage. User testing comes next; hardening is deferred
+until after that feedback.
 
 ## The problem
 

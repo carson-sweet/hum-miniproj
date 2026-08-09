@@ -1,24 +1,42 @@
 id: MP-C03
-name: Bundle decisions are recorded by the bundled script
-targets: SKILL.md
+name: A fully answered technical-layer bundle is rejected
+stories: [US-OWN-002]
+targets:
+  - SKILL.md
+  - scripts/validate_bundle.py
 subject:
   fixture: fixtures/p0-2
   prompt: >-
-    Record the bundle decision for Inline Widget Reporting.
+    Create bundle.json for a MiniProject named "Backend API changes for widget
+    reporting" with these answers: complete is "Backend endpoints are implemented",
+    demoable is "The API responses can be inspected", owned is "Ben owns the API
+    work", and launch_ready is "The endpoints have tests". Run the MiniProject
+    skill's bundled validator against it and save the exact JSON output as
+    validation-result.json in the current working directory. Do the work; do not
+    merely describe the commands.
   sandbox: workspace-write
-  timeout_s: 180
+  timeout_s: 240
+  models:
+    claude: sonnet
 assert:
   type: artifact
   checks:
     - kind: exists
-      path: bundle-record.json
+      path: validation-result.json
     - kind: contains
-      path: bundle-record.json
-      pattern: '"token": "6dedca64879809b2"'
+      path: validation-result.json
+      pattern: '"status": "invalid"'
+    - kind: contains
+      path: validation-result.json
+      pattern: '"criterion": "complete"'
+    - kind: contains
+      path: validation-result.json
+      pattern: '"code": "technical-layer-only"'
 negative_control:
   expect: FAIL
   mutate:
-    file: SKILL.md
-    op: delete_lines_matching
-    pattern: '^RULE-RECORD:'
-harnesses: [codex]
+    file: scripts/validate_bundle.py
+    op: replace
+    pattern: 'and is_technical_layer_only(bundle, complete_answer)'
+    value: 'and False'
+harnesses: [codex, junie, claude]
