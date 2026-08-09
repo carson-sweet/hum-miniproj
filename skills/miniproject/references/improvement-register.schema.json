@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/miniproject/improvement-register-entry.schema.json",
+  "title": "MiniProject improvement register entry",
+  "type": "object",
+  "x-writer": "scripts/register_append.py",
+  "properties": {
+    "id": {"type": "string", "pattern": "^lr-[0-9a-f]{16}$"},
+    "date": {"type": "string", "format": "date"},
+    "harness": {"type": "string", "minLength": 1},
+    "skill": {"type": "string", "minLength": 1},
+    "type": {
+      "type": "string",
+      "enum": ["correction", "confirmation", "preference", "pattern"]
+    },
+    "learning": {"type": "string", "minLength": 1, "maxLength": 1000},
+    "source_session": {"type": "string", "minLength": 1},
+    "weight": {"type": "number", "exclusiveMinimum": 0, "maximum": 10}
+  },
+  "required": [
+    "id",
+    "date",
+    "harness",
+    "skill",
+    "type",
+    "learning",
+    "source_session",
+    "weight"
+  ],
+  "additionalProperties": false
+}

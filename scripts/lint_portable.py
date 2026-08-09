@@ -118,6 +118,9 @@ def lint_skill(skill_dir: Path) -> list[Violation]:
         relative = path.relative_to(skill_dir)
         relative_text = relative.as_posix()
 
+        if "__pycache__" in relative.parts or path.suffix in {".pyc", ".pyo"}:
+            continue
+
         if path.is_symlink():
             violations.append(
                 Violation(relative_text, 1, "symlink", "skill source must not contain symlinks")

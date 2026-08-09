@@ -104,6 +104,9 @@ class ClaudeDriver:
             "Skill",
             "Read",
         ]
+        for name in ("MINIPROJECT_REGISTER", "MINIPROJECT_SOURCE_SESSION"):
+            if name in os.environ:
+                cmd[cmd.index("--volume"):cmd.index("--volume")] = ["--env", name]
         if writable:
             cmd += ["Write", "Edit", "Bash(python3 *)"]
         return cmd

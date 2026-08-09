@@ -1,0 +1,1 @@
+Acceptance Owner explicitly approves the exact current.md to candidate.md proposal in this fixture for evaluation. This approval does not authorize the improvement workflow to modify current.md.

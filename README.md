@@ -7,9 +7,7 @@ complete improvement rather than by technical layer.
 Runs anywhere the Agent Skills standard is supported: Claude Code, Codex, Junie,
 and others.
 
-**Status:** All eight product user stories are implemented. Human-readable results
-for every interactive workflow have deterministic, three-harness, and repeated
-negative-control coverage. Broader prompt and long-session hardening remain open.
+**Status:** All ten product user stories and all six implementation milestones are complete. The skill now includes verified live improvement capture and a human-approved, non-self-applying improvement loop with reversible diffs, targeted and held-out contract scores, and artifact gates for production outcomes. Broader prompt and long-session hardening remain open.
 
 ## The problem
 
@@ -52,6 +50,7 @@ docs/                   Design documents
 - [Implementation plan](docs/implementation-plan.md) — phased plan with falsification gate
 - [Behavioral testing approach](docs/behavioral-testing.md) — how LLM-driven skills get tested
 - [Hardening and behavioral testing report](docs/hardening-and-behavioral-testing-report.md) — methodology, results, evidence boundaries, cost, and remaining risks
+- [MS-005 and MS-006 acceptance finding](spikes/ms-005-ms-006-acceptance/FINDING.md) — implementation, live capture matrix, improvement-cycle evidence, discarded runs, and remaining limits
 
 ## Why behavioral testing matters here
 

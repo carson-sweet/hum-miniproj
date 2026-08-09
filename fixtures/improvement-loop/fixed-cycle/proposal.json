@@ -1,0 +1,16 @@
+{
+  "analysis_sha256": "410689737e58aecbdb5afb4300280b5ccd2fcf6fde999a71231d0521f8a0d9ae",
+  "base_sha256": "0ccdeec4b0722bce32127e27d49ac8dde47bc5d391ac34afb66558516ac106ef",
+  "candidate_sha256": "7e294efa8d9486918fa491efbd0d87ba0ac6f87ea347a170ecb0dbb736be72cf",
+  "diff": "--- SKILL.md\n+++ SKILL.md.candidate\n@@ -1 +1 @@\n-Keep technical-layer bundles.\n+Reject technical-layer-only bundles.\n",
+  "entry_ids": [
+    "lr-e000000000000001",
+    "lr-e000000000000002"
+  ],
+  "pattern_id": "pattern-correction-skill-md",
+  "proposal_id": "proposal-b8aafa0d78949651",
+  "reverse_diff": "--- SKILL.md.candidate\n+++ SKILL.md\n@@ -1 +1 @@\n-Reject technical-layer-only bundles.\n+Keep technical-layer bundles.\n",
+  "schema_version": 1,
+  "status": "proposed",
+  "target": "SKILL.md"
+}

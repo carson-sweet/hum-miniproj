@@ -43,6 +43,20 @@ def test_writable_subject_only_changes_the_fixture_mount(driver, tmp_path):
     assert f"{driver.skill_dir.resolve()}:/root/.claude/skills/miniproject:ro" in " ".join(cmd)
 
 
+def test_container_command_passes_capture_environment(driver, tmp_path, monkeypatch):
+    monkeypatch.setenv("MINIPROJECT_REGISTER", "improvement-register.jsonl")
+    monkeypatch.setenv("MINIPROJECT_SOURCE_SESSION", "capture-contract-001")
+    fixture = tmp_path / "fixture"
+    fixture.mkdir()
+
+    cmd = driver.build_subject_command(
+        fixture=fixture, prompt="capture it", model="haiku", writable=True,
+    )
+
+    assert "MINIPROJECT_REGISTER" in cmd
+    assert "MINIPROJECT_SOURCE_SESSION" in cmd
+
+
 def test_driver_requires_process_only_oauth_token(driver, monkeypatch):
     monkeypatch.delenv("CLAUDE_CODE_OAUTH_TOKEN", raising=False)
     with pytest.raises(RuntimeError, match="CLAUDE_CODE_OAUTH_TOKEN"):

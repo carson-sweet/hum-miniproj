@@ -1,0 +1,25 @@
+{
+  "entry_count": 2,
+  "live_entry_count": 2,
+  "min_occurrences": 2,
+  "patterns": [
+    {
+      "count": 2,
+      "entry_ids": [
+        "lr-e000000000000001",
+        "lr-e000000000000002"
+      ],
+      "learnings": [
+        "Reject technical-layer-only bundles.",
+        "A bundle must deliver an end-to-end improvement."
+      ],
+      "pattern_id": "pattern-correction-skill-md",
+      "target": "SKILL.md",
+      "type": "correction",
+      "weight": 2.0
+    }
+  ],
+  "register_sha256": "b4036fd65adcd5d76011f4816e7d688494605bf14195bad940612ea0947f47d1",
+  "schema_version": 1,
+  "seed_entry_count": 0
+}
