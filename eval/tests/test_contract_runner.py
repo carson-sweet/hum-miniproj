@@ -208,6 +208,8 @@ def test_every_user_facing_workflow_has_an_exact_plain_language_contract():
         prompt = contract["subject"]["prompt"].lower()
         assert "redirect stdout directly" in prompt
         assert "do not reconstruct" in prompt
+        assert "do not modify or repair" in prompt
+        assert "installed miniproject skill or validator" in prompt
         patterns = [
             check["pattern"]
             for check in contract["assert"]["checks"]
@@ -221,6 +223,15 @@ def test_every_user_facing_workflow_has_an_exact_plain_language_contract():
         mutation = contract["negative_control"]["mutate"]
         assert mutation["pattern"] == removed_wording
         assert mutation["value"] != removed_wording
+
+
+def test_semantic_artifact_contracts_forbid_subject_repairs():
+    for contract_id in ("MP-C05", "MP-C06", "MP-C07", "MP-C08"):
+        contract = load_contracts(contract_id)[0]
+        prompt = contract["subject"]["prompt"].lower()
+
+        assert "do not modify or repair" in prompt
+        assert "installed miniproject skill or validator" in prompt
 
 
 def test_metered_budget_reserves_room_for_the_next_subject_call(monkeypatch):

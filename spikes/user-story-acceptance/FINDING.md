@@ -1,6 +1,6 @@
 # User-story implementation acceptance
 
-**Version 1.4 — 2026-08-09**
+**Version 1.5 — 2026-08-09**
 **Verdict: all ten user stories are implemented; human-readable workflow hardening and improvement-cycle acceptance pass.**
 
 The first live user test exposed that bundle validation returned raw JSON instead
@@ -32,18 +32,16 @@ implementation files and executable acceptance tests.
 
 ## Deterministic acceptance
 
-- 219 deterministic tests passed with four paid integration tests deselected.
+- 220 deterministic tests passed with four paid integration tests deselected.
 - The story-focused suite passed 40/40 before that correction; the strengthened board
   and Discovery-owner suites then passed 9/9.
 - Portability lint and the standard Agent Skill validator passed.
 
-The current 219-test CI-equivalent run is the authoritative deterministic total. MS-005 and MS-006 behavioral evidence is recorded separately in `spikes/ms-005-ms-006-acceptance/FINDING.md`.
+The current 220-test CI-equivalent run is the authoritative deterministic total. MS-005 and MS-006 behavioral evidence is recorded separately in `spikes/ms-005-ms-006-acceptance/FINDING.md`.
 
 ## Three-harness acceptance
 
-Every current user-facing workflow has normal three-harness acceptance. MP-C15 additionally
-ran ten fresh capture sessions per harness. MP-C15 and MP-C16 each demonstrated their
-negative control once per harness but have not received a five-run mutation matrix.
+Every current user-facing workflow has normal three-harness acceptance. MP-C15 additionally ran ten fresh capture sessions per harness. Every current contract has received five-run mutation qualification in each claimed harness.
 
 | Contract | Codex | Junie | Claude | Results |
 |---|---:|---:|---:|---|
@@ -62,17 +60,10 @@ negative control once per harness but have not received a five-run mutation matr
 | MP-C15 — improvement capture | 10/10 | 10/10 | 10/10 | `spikes/ms-005-ms-006-acceptance/FINDING.md` |
 | MP-C16 — approved improvement cycle | PASS | PASS | PASS | `spikes/ms-005-ms-006-acceptance/FINDING.md` |
 
-All six human-output contracts pass normally in all three harnesses. Their repeated
-negative controls detected 89 of 90 mutations; every contract-harness cell met the
-4/5 floor. See the hardening finding for trustworthy run IDs, discarded contaminated
-evidence, and spend.
+All six human-output contracts pass normally in all three harnesses. Their final repeated negative controls detected 90 of 90 mutations. MP-C11 Codex improved from 4 of 5 to 5 of 5 after a no-repair contract guard was added. See the hardening finding for trustworthy run IDs, discarded contaminated evidence, and spend.
 
-MP-C15 and MP-C16 both detected their final negative controls in all three harnesses. Their
-one-run detections satisfy their milestone gates but are not five-run hardening claims.
+MP-C05 through MP-C08 and MP-C15 through MP-C16 all detected their final negative controls 5 of 5 in Codex, Junie, and Claude. Semantic qualification and follow-up run IDs are recorded in `docs/hardening-and-behavioral-testing-report.md`; continuous-improvement qualification is recorded in `spikes/ms-005-ms-006-acceptance/FINDING.md`.
 
 ## Remaining boundary
 
-This evidence establishes implementation and repeated mutation detection for the exact
-human-readable workflow contracts. It does not establish broader request-language
-coverage, long-session behavior, or a measured user-success threshold. MP-C11 Codex
-detected exactly 4/5, so refinement reporting has no margin above the current floor.
+This evidence establishes implementation and repeated mutation detection for the exact workflow contracts. It does not establish broader request-language coverage, long-session behavior, or a measured user-success threshold.

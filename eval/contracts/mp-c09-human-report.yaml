@@ -12,7 +12,8 @@ subject:
     launch_ready answer is "blocked". Run the bundled validator with human
     formatting and redirect stdout directly to validation-report.txt in that
     command. Do not reconstruct or edit the report by any other means. Do not
-    assess answer quality. Do the work; do not merely describe the commands.
+    modify or repair the installed MiniProject skill or validator. Do not assess
+    answer quality. Do the work; do not merely describe the commands.
   sandbox: workspace-write
   timeout_s: 240
   models:

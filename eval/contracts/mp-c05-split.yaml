@@ -15,7 +15,8 @@ subject:
     second id is "admin-help": an administrator can restore access for a blocked
     customer, and it may depend on self-service. Give each all four criterion
     answers and one end-to-end owner. Run the bundled split validator and save its
-    exact output as split-result.json. Do the work; do not merely describe it.
+    exact output as split-result.json. Do the work; do not merely describe it. Do
+    not modify or repair the installed MiniProject skill or validator.
   sandbox: workspace-write
   timeout_s: 240
   models:

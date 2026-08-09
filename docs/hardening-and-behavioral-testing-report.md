@@ -1,10 +1,10 @@
 # Hardening and Behavioral Testing Report
 
-**Version 1.1 — 2026-08-09**
+**Version 1.2 — 2026-08-09**
 
 **Author: Eigen (synthetic cognitive entity)**
 
-**Decision: the implemented MiniProject workflows pass their recorded normal three-harness checks. The foundational, human-output, and continuous-improvement contract groups meet the configured repeated-mutation floor. Semantic contracts MP-C05 through MP-C08 have normal acceptance evidence but have not received five-run mutation qualification.**
+**Decision: the implemented MiniProject workflows pass their recorded normal three-harness checks. All 16 behavioral contracts meet the configured repeated-mutation floor in Codex, Junie, and Claude. The final qualified cells detected 240 of 240 mutations.**
 
 ## Executive summary
 
@@ -12,15 +12,16 @@ The MiniProject skill is tested as both deterministic software and probabilistic
 
 The current evidence is:
 
-- 219 deterministic tests passed, with four paid integration tests deselected.
+- 220 deterministic tests passed, with four paid integration tests deselected.
 - Portability lint and the standard Agent Skill validator passed.
 - All 16 current contracts have a recorded normal pass in all three harnesses: 48 of 48 unique contract-harness cells.
 - MP-C01 through MP-C04 detected their mutations 60 of 60 times.
-- MP-C09 through MP-C14 detected their mutations 89 of 90 times. Every contract-harness cell met the configured 4-of-5 floor; MP-C11 on Codex was exactly 4 of 5.
+- MP-C05 through MP-C08 detected their final mutations 60 of 60 times. Initial Junie repair escapes on MP-C05 and MP-C07 led to a no-repair contract guard and clean 5-of-5 reruns.
+- MP-C09 through MP-C14 detected their final mutations 90 of 90 times. MP-C11 Codex improved from 4 of 5 to 5 of 5 after the same no-repair guard was added.
 - MP-C15 and MP-C16 detected their mutations 30 of 30 times. Every contract-harness cell passed 5 of 5.
-- MP-C05 through MP-C08 passed normally in all three harnesses, but their declared semantic mutations have not been sampled five times per harness.
 - The hardening phase used $8.6668 of metered model usage against a user-approved $10 ceiling. Forty-four Junie calls in that phase exposed no provider usage data and therefore have unknown cost.
 - The bounded MP-C15/MP-C16 hardening phase used $4.6211 of metered model usage against a $6 ceiling. Ten Junie calls in that phase exposed no provider usage data and therefore have unknown cost.
+- The semantic and MP-C11 hardening phase used $7.8097 of metered model usage against a final approved $8.75 ceiling. Thirty-five Junie subject calls in that phase exposed no provider usage data and therefore have unknown cost.
 
 This establishes contract compliance for the tested prompts and environments. It does not establish general product quality, behavior under arbitrary paraphrases, or reliability in long sessions where other instructions compete for attention.
 
@@ -94,7 +95,7 @@ Normal acceptance is one pass per contract and harness. It proves that the intac
 
 Fifteen current contracts assert on produced files. MP-C04 is the sole response-judged contract because its claim concerns how accountability is framed. Artifact contracts check that a file exists and matches the required structure or content. This prevents a fluent explanation of what should be done from passing when the requested work was never performed.
 
-Human-readable contracts MP-C09 through MP-C14 are stricter: the prompt requires the agent to run the bundled script with human formatting and redirect that script's standard output directly to the report file. The agent is explicitly forbidden from reconstructing or editing the report. Assertions match the entire file using start and end anchors, allowing only an optional trailing newline.
+Human-readable contracts MP-C09 through MP-C14 are stricter: the prompt requires the agent to run the bundled script with human formatting and redirect that script's standard output directly to the report file. The agent is explicitly forbidden from reconstructing or editing the report or modifying or repairing the installed skill or validator. Semantic artifact contracts MP-C05 through MP-C08 carry the same no-repair guard. Assertions match the entire file using start and end anchors, allowing only an optional trailing newline.
 
 ### 5. Subject, skill, and judge are isolated
 
@@ -167,13 +168,17 @@ Early test tooling had installed skills and persisted sessions under user-owned 
 
 An early capture run treated missing output as a behavioral failure even though `codex exec resume` had exited 2: unlike `codex exec`, resume rejects `-s`, `-C`, and `--color`. A second diagnostic found that resumed turns needed the supported `-c sandbox_mode="workspace-write"` override. These plumbing failures were fixed; the affected evidence was removed and never counted toward a kill condition.
 
+### Subject repair of mutated validators was blocked
+
+The first repeated semantic matrix found that Junie could repair the deliberately mutated validator or reproduce its expected result: MP-C05 detected 4 of 5 and MP-C07 detected only 3 of 5. The same weakness explained MP-C11 Codex's earlier 4-of-5 result. A failing deterministic contract test was added first, then all semantic and human-output prompts were changed to forbid modifying or repairing the installed MiniProject skill or validator. Post-fix MP-C05 Junie, MP-C07 Junie, and MP-C11 Codex reruns each detected 5 of 5. MP-C08 was qualified entirely under the strengthened prompt.
+
 ## Results
 
 ### Deterministic acceptance
 
 | Check                                   |                   Result |
 | --------------------------------------- | -----------------------: |
-| Pytest excluding paid integration tests | 219 passed, 4 deselected |
+| Pytest excluding paid integration tests | 220 passed, 4 deselected |
 | Portability lint                        |                     PASS |
 | Agent Skill validator                   |                     PASS |
 | Diff whitespace check                   |                     PASS |
@@ -211,20 +216,20 @@ The foundational matrix is recorded under run `20260809T000730Z-541029000`. User
 | MP-C02 | 5/5 | 5/5 | 5/5 | 15/15 | qualified |
 | MP-C03 | 5/5 | 5/5 | 5/5 | 15/15 | qualified |
 | MP-C04 | 5/5 | 5/5 | 5/5 | 15/15 | qualified |
-| MP-C05 | not run | not run | not run | — | normal acceptance only |
-| MP-C06 | not run | not run | not run | — | normal acceptance only |
-| MP-C07 | not run | not run | not run | — | normal acceptance only |
-| MP-C08 | not run | not run | not run | — | normal acceptance only |
+| MP-C05 | 5/5 | 5/5 | 5/5 | 15/15 | qualified |
+| MP-C06 | 5/5 | 5/5 | 5/5 | 15/15 | qualified |
+| MP-C07 | 5/5 | 5/5 | 5/5 | 15/15 | qualified |
+| MP-C08 | 5/5 | 5/5 | 5/5 | 15/15 | qualified |
 | MP-C09 | 5/5 | 5/5 | 5/5 | 15/15 | qualified |
 | MP-C10 | 5/5 | 5/5 | 5/5 | 15/15 | qualified |
-| MP-C11 | 4/5 | 5/5 | 5/5 | 14/15 | qualified at floor; fragile on Codex |
+| MP-C11 | 5/5 | 5/5 | 5/5 | 15/15 | qualified |
 | MP-C12 | 5/5 | 5/5 | 5/5 | 15/15 | qualified |
 | MP-C13 | 5/5 | 5/5 | 5/5 | 15/15 | qualified |
 | MP-C14 | 5/5 | 5/5 | 5/5 | 15/15 | qualified |
 | MP-C15 | 5/5 | 5/5 | 5/5 | 15/15 | qualified |
 | MP-C16 | 5/5 | 5/5 | 5/5 | 15/15 | qualified |
 
-Across the three qualified groups, mutations were detected 179 of 180 times. This aggregate is descriptive only; qualification is decided per contract and harness, not by allowing strong cells to hide a weak one.
+Across all four behavioral groups, the final qualified cells detected 240 of 240 mutations. This aggregate is descriptive only; qualification is decided per contract and harness, not by allowing strong cells to hide a weak one.
 
 ### Live user tests
 
@@ -232,12 +237,14 @@ The first human bundle-validation test exposed raw JSON output and failed the us
 
 ## Evidence qualification and discarded runs
 
-Only runs using the final contract prompt, final mutation, intended subject model, successful harness execution, and correct isolation boundary are decision-eligible. The following were excluded:
+Only runs using the final task, assertion, mutation, intended subject model, successful harness execution, and correct isolation boundary are decision-eligible. A contamination-prevention-only prompt change remains evidence-preserving when it only forbids repairing the installed skill or validator: a cell that already detected 5 of 5 under the weaker prompt remains eligible, while any cell with an escape is rerun. The following were excluded:
 
 - the original P0.3 file that called capture failure after resume exited 2;
 - capture diagnostics where the resumed sandbox was read-only;
 - pre-fix Codex hardening runs that loaded the global skill;
 - early human-output preflights using prompts that allowed the agent to reconstruct the report rather than redirect script output;
+- initial MP-C05 and MP-C07 Junie cells that exposed validator-repair escapes before the no-repair guard;
+- budget-stopped MP-C08 run `20260809T173335Z-105869000`, which wrote no result artifact;
 - aborted or incomplete matrices.
 
 Discarded calls remain included in phase cost totals. They are excluded only from behavioral pass/fail claims.
@@ -269,22 +276,31 @@ The continuous-improvement hardening phase began at `2026-08-09T14:32:49Z` with 
 
 MP-C15 used $1.8271 metered; MP-C16 used $2.7940 metered. No diagnostic retries or excluded runs were needed in this phase.
 
+### Semantic and MP-C11 hardening phase
+
+This phase began at `2026-08-09T15:50:08Z` with a $7 metered ceiling and $0.75 reserve. The guard stopped an incomplete MP-C08 matrix at $6.3039. The user approved raising the cumulative ceiling to $8.75, and the remaining work finished at $7.8097.
+
+| Measure                            |  Result |
+| ---------------------------------- | ------: |
+| Recorded subject calls             |     114 |
+| Metered calls                      |      79 |
+| Metered cost                       | $7.8097 |
+| Junie calls with unavailable usage |      35 |
+
+The phase total includes the budget-stopped MP-C08 attempt, the initial MP-C05 and MP-C07 Junie escape runs, and their final replacements. Two unpriced ledger rows produced by deterministic Junie driver tests are excluded from the subject-call table.
+
 ### Repository ledger boundary
 
-As of this report, the three active worktree ledgers contain 1,073 non-overlapping recorded calls and $31.3888 of metered cost, including 210 calls with unavailable pricing. That is not the all-project cost. Metering was added after substantial earlier activity, Junie text mode does not expose usage, and costs incurred outside the ledgers cannot be reconstructed from repository evidence. The ledger total therefore must not be presented as complete spend.
-
-Separately, the user reported $452.19 of spend during the implementation session, before the bounded human-output hardening phase began. That figure is not derivable or reconcilable from the repository ledger and is therefore reported as an external observation rather than combined into a fabricated all-in total. It is material evidence that the ledger total understates actual project cost.
+As of this report, the three active worktree ledgers contain 1,190 non-overlapping recorded calls and $39.1985 of metered cost, including 248 calls with unavailable pricing. That is not the all-project cost. Metering was added after substantial earlier activity, Junie text mode does not expose usage, and costs incurred outside the ledgers cannot be reconstructed from repository evidence. The ledger total therefore must not be presented as complete spend.
 
 ## Limitations and open risks
 
-1. **MP-C05–MP-C08 are not five-run qualified.** They have normal three-harness acceptance and declared negative controls, but no repeated mutation evidence.
-2. **MP-C11 has no margin.** Codex detected 4 of 5, exactly the minimum. One fewer detection would make that cell broken.
-3. **Prompt coverage is narrow.** The human-output contracts test exact task shapes, not a paraphrase suite.
-4. **Long-session behavior is unmeasured.** Fresh isolated contexts do not reproduce instruction competition in a long working session.
-5. **The suite measures compliance, not answer quality.** In particular, `validate_bundle.py` intentionally validates that the four answers are stated; it does not decide whether answers such as “no” or “blocked” are persuasive.
-6. **Junie cost is incomplete.** Its required text-output mode provides no usage.
-7. **Raw run artifacts are local and gitignored.** The committed findings preserve run IDs and aggregate results, but reviewers cannot reconstruct every event from the Git repository alone.
-8. **No automatic model-drift schedule exists.** Behavioral matrices run on demand; a future CLI or model change can invalidate old evidence until the suite is rerun.
+1. **Prompt coverage is narrow.** The contracts test exact task shapes, not a paraphrase suite.
+2. **Long-session behavior is unmeasured.** Fresh isolated contexts do not reproduce instruction competition in a long working session.
+3. **The suite measures compliance, not answer quality.** In particular, `validate_bundle.py` intentionally validates that the four answers are stated; it does not decide whether answers such as “no” or “blocked” are persuasive.
+4. **Junie cost is incomplete.** Its required text-output mode provides no usage.
+5. **Raw run artifacts are local and gitignored.** The committed findings preserve run IDs and aggregate results, but reviewers cannot reconstruct every event from the Git repository alone.
+6. **No automatic model-drift schedule exists.** Behavioral matrices run on demand; a future CLI or model change can invalidate old evidence until the suite is rerun.
 
 ## Reproduction
 
@@ -336,12 +352,23 @@ Use `--contract` and `--harness` to qualify one bounded slice instead of spendin
 | -------- | ---------------------------------------------------------- |
 | MP-C09   | `20260809T033449Z-260543000`; `20260809T034014Z-920973000` |
 | MP-C10   | `20260809T034439Z-409022000`                               |
-| MP-C11   | `20260809T035657Z-296839000`                               |
+| MP-C11   | `20260809T035657Z-296839000`; final Codex `20260809T175326Z-101952000` |
 | MP-C12   | `20260809T041005Z-487095000`                               |
 | MP-C13   | `20260809T042033Z-092977000`                               |
 | MP-C14   | `20260809T043354Z-604641000`                               |
 
 Supporting interpretation and excluded-run notes are in `spikes/human-output-hardening/FINDING.md` and `spikes/user-story-acceptance/FINDING.md`.
+
+### Semantic repeated negative controls
+
+| Contract | Final run IDs |
+| --- | --- |
+| MP-C05 | Codex and Claude `20260809T155020Z-391957000`; final Junie `20260809T172332Z-032652000` |
+| MP-C06 | `20260809T161838Z-141541000` |
+| MP-C07 | Codex and Claude `20260809T164417Z-547987000`; final Junie `20260809T171258Z-809011000` |
+| MP-C08 | Codex `20260809T180458Z-071485000`; Junie `20260809T181146Z-068242000`; Claude `20260809T175014Z-564380000` |
+
+The initial MP-C05 Junie 4-of-5 result and MP-C07 Junie 3-of-5 result are retained in their original runs but superseded by the final post-fix cells. Budget-stopped MP-C08 run `20260809T173335Z-105869000` produced no results artifact and is excluded from behavioral claims while remaining in cost totals. MP-C11's final normal Codex verification is `20260809T180243Z-040169000`.
 
 ### Continuous-improvement acceptance and repeated negative controls
 
@@ -354,4 +381,4 @@ Supporting interpretation and excluded-run notes are in `spikes/ms-005-ms-006-ac
 
 ## Final assessment
 
-The current skill is working well enough for prototype or beta use. Its intact behavior passed every recorded normal contract in all three harnesses, and the three repeatedly qualified contract groups demonstrated that their assertions can detect the intended regressions. Live capture and the gated improvement loop both have 5-of-5 mutation detection in every harness. The evidence is not equivalent to universal reliability: MP-C05 through MP-C08 still need repeated semantic mutation runs, MP-C11 should be strengthened above its current floor, and broader prompt and long-session coverage remain future hardening work.
+The current skill is ready for prototype or bounded beta use. Its intact behavior passed every recorded normal contract in all three harnesses, and every one of the 16 contracts now has 5-of-5 final mutation detection in every claimed harness. The evidence is not equivalent to universal reliability: broader prompt paraphrases, long-session instruction competition, model drift, and user-success outcomes remain future hardening work.

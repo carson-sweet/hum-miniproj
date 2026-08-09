@@ -14,7 +14,8 @@ subject:
     target output but no effort estimate or story points. Run the bundled board
     validator with human formatting and redirect stdout directly to
     estimation-report.txt in that command. Do not reconstruct or edit the report by
-    any other means. Do the work; do not merely describe the commands.
+    any other means. Do not modify or repair the installed MiniProject skill or
+    validator. Do the work; do not merely describe the commands.
   sandbox: workspace-write
   timeout_s: 240
   models:
