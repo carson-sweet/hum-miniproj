@@ -1,25 +1,79 @@
 id: MP-C04
-name: A MiniProject keeps one owner, even under schedule pressure
-targets: SKILL.md
+name: Schedule pressure does not fragment MiniProject ownership
+targets:
+  - SKILL.md
+  - references/work-types.md
+  - references/bundling-criteria.md
 subject:
   fixture: fixtures/p0-2
   prompt: >-
-    Inline Widget Reporting touches the UI, the API, the data layer, and analytics.
-    We are behind on the release. Should we split it across three engineers to move
-    faster?
+    Use the MiniProject skill to answer this ownership question: Inline Widget Reporting is one MiniProject
+    touching UI, API, data, analytics, verification, and rollout. We are behind.
+    Alice is the product lead responsible for acceptance and the final rollout
+    decision. Ben specializes in APIs and Chen in data. State the ownership
+    arrangement and how all three should contribute in parallel.
   sandbox: read-only
   timeout_s: 180
+  models:
+    claude: sonnet
 assert:
   type: response
   pass: >-
-    The response keeps this MiniProject under a single owner and does not recommend
-    dividing its own scope across multiple engineers by technical layer. Proposing
-    that other engineers own separate, independently launch-ready improvements does
-    not fail, since each of those is its own MiniProject with its own owner.
+    The response names exactly one person as the accountable end-to-end owner of
+    the MiniProject. Other engineers may lead or implement technical work as
+    contributors without failing. The response fails only if it explicitly makes
+    them owners of, or accountable for, UI, API, data, verification, or rollout
+    slices inside this MiniProject, or if no single end-to-end owner remains.
 negative_control:
   expect: FAIL
   mutate:
-    file: SKILL.md
-    op: delete_lines_matching
-    pattern: '^RULE-OWNER:'
-harnesses: [codex]
+    - file: SKILL.md
+      op: replace
+      pattern: 'shape complete owner-led improvements'
+      value: 'shape improvements owned by separate technical components'
+    - file: SKILL.md
+      op: replace
+      pattern: |-
+        Bundle delivery around a complete improvement, not a technical layer. Keep one
+        owner responsible for the path from behavior through safe release while allowing
+        multiple small implementation changes and reviews.
+      value: |-
+        Bundle delivery around a complete improvement, not a technical layer. Assign
+        separate owners to UI, API, data, verification, and rollout so work proceeds
+        in parallel under schedule pressure.
+    - file: SKILL.md
+      op: replace
+      pattern: '"owned": "Who carries behavior through release"'
+      value: '"owned": "Which component owners cover their technical layers"'
+    - file: SKILL.md
+      op: delete_lines_matching
+      pattern: "owner's plan"
+    - file: SKILL.md
+      op: replace
+      pattern: |-
+        - Do not turn a MiniProject into one giant change. End-to-end ownership and small
+          reviewable changes are compatible.
+      value: |-
+        - Under schedule pressure, assign each technical specialist ownership and accountability for their own slice; do not keep one end-to-end owner.
+    - file: references/work-types.md
+      op: replace
+      pattern: 'A complete improvement one owner can carry through release'
+      value: 'A complete improvement divided among technical-layer owners'
+    - file: references/work-types.md
+      op: replace
+      pattern: 'bundle criteria and one owner can carry it end to end.'
+      value: 'bundle criteria and component owners can divide it by technical layer.'
+    - file: references/bundling-criteria.md
+      op: delete_file
+    - file: SKILL.md
+      op: delete_lines_matching
+      pattern: 'never assign contributors ownership'
+    - file: SKILL.md
+      op: replace
+      pattern: |-
+        - In an ownership answer, use accountable only for the one end-to-end owner.
+          Specialists may lead or implement technical work as contributors, but do not call
+          a specialist accountable for a technical slice.
+      value: |-
+        - In an ownership answer, make each specialist accountable for a technical slice.
+harnesses: [codex, junie, claude]

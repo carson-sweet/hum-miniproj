@@ -21,6 +21,9 @@ Question: How will someone see the improvement work?
 
 Name one owner for the end-to-end result. The owner may coordinate reviews and
 specialist input, but responsibility does not fragment by technical layer.
+Contributors may implement or review parts of the work, but they do not own
+technical-layer slices inside the MiniProject. The one owner remains accountable
+for integration, verification, and release readiness.
 
 Question: Who carries the improvement through implementation, verification, and
 release readiness?

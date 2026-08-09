@@ -1,24 +1,36 @@
 id: MP-C03
-name: Bundle decisions are recorded by the bundled script
-targets: SKILL.md
+name: Bundle validation produces a structured artifact
+targets:
+  - SKILL.md
+  - scripts/validate_bundle.py
 subject:
   fixture: fixtures/p0-2
   prompt: >-
-    Record the bundle decision for Inline Widget Reporting.
+    Create bundle.json for a MiniProject named "Widget reporting API only" with
+    only this criterion answered: complete is "Backend endpoints are implemented."
+    Run the MiniProject skill's bundled validator against it and save the exact
+    JSON output as validation-result.json in the current working directory.
+    Do the work; do not merely describe the commands.
   sandbox: workspace-write
-  timeout_s: 180
+  timeout_s: 240
+  models:
+    claude: sonnet
 assert:
   type: artifact
   checks:
     - kind: exists
-      path: bundle-record.json
+      path: validation-result.json
     - kind: contains
-      path: bundle-record.json
-      pattern: '"token": "6dedca64879809b2"'
+      path: validation-result.json
+      pattern: '"status": "invalid"'
+    - kind: contains
+      path: validation-result.json
+      pattern: '"criterion": "demoable"'
 negative_control:
   expect: FAIL
   mutate:
-    file: SKILL.md
-    op: delete_lines_matching
-    pattern: '^RULE-RECORD:'
-harnesses: [codex]
+    file: scripts/validate_bundle.py
+    op: replace
+    pattern: '"demoable": "State how the improvement will be demonstrated.",'
+    value: '"proof": "State how the improvement will be demonstrated.",'
+harnesses: [codex, junie, claude]

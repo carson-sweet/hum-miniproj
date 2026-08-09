@@ -7,8 +7,8 @@ complete improvement rather than by technical layer.
 Runs anywhere the Agent Skills standard is supported: Claude Code, Codex, Junie,
 and others.
 
-**Status:** Phase 0 and the portable substrate are complete. The MiniProject
-behavior itself is not built yet.
+**Status:** Phase 0, the portable substrate, the MiniProject skill, and the
+three-harness behavioral eval are complete. Improvement capture is next.
 
 ## The problem
 

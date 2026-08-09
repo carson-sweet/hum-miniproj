@@ -6,7 +6,7 @@ than by technical layer. Runs anywhere the Agent Skills standard is supported.
 
 ## Key directories
 
-- `skills/miniproject/` — the portable skill: SKILL.md, references, validators (not yet created)
+- `skills/miniproject/` — the portable skill: SKILL.md, references, validator
 - `eval/` — behavioral contract harness; drivers, judge, assertions
 - `fixtures/` — disposable fixtures copied to temp for each subject run
 - `docs/` — design documents
@@ -26,6 +26,12 @@ python3 -m pytest -m integration
 # Prove the harness end to end on the throwaway fixture
 python3 -m eval.smoke
 
+# Run the production behavioral matrix across Codex, Junie, and Claude
+python3 -m eval.run_contracts
+
+# Qualify every negative control (five trials per contract and harness)
+python3 -m eval.run_contracts --negative-control --repeat 5
+
 # What have model calls cost?
 python3 -m eval.spend
 ```
@@ -35,7 +41,10 @@ cheapest capable option (`gpt-5.6-luna`); override with `EVAL_SUBJECT_MODEL` /
 `EVAL_JUDGE_MODEL` when capability is genuinely the variable under test.
 
 Integration tests and the smoke run require `codex` on PATH and an authenticated
-Codex session. `python3 -m eval.smoke` exits 0 green, 1 red, 3 on probe failure.
+Codex session. The production behavioral matrix additionally requires Junie,
+the pinned Claude Docker image, and `JUNIE_API_KEY` plus
+`CLAUDE_CODE_OAUTH_TOKEN` in the gitignored `.env.local`. `python3 -m eval.smoke`
+exits 0 green, 1 red, 3 on probe failure.
 
 ## Project-specific rules
 

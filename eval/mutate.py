@@ -19,6 +19,20 @@ class MutationResult:
     detail: str
 
 
+def apply_mutations(skill_dir: Path, specs: dict | list[dict]) -> MutationResult:
+    """Apply every declared mutation and fail closed if any one is inert."""
+    items = specs if isinstance(specs, list) else [specs]
+    if not items:
+        return MutationResult(False, 0, "no mutations declared")
+
+    results = [apply_mutation(skill_dir, spec) for spec in items]
+    return MutationResult(
+        applied=all(result.applied for result in results),
+        matched=sum(result.matched for result in results),
+        detail="; ".join(result.detail for result in results),
+    )
+
+
 def _resolve(skill_dir: Path, rel: str) -> Path:
     skill_dir = Path(skill_dir).resolve()
     candidate = (skill_dir / rel).resolve()

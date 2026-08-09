@@ -17,7 +17,10 @@ multiple small implementation changes and reviews.
    - **Chore fast lane:** identify it as a Chore and do not run bundle validation.
      Handle it as a small, specific, low-variance request.
    - **Discovery:** define the question, owner, time box, decision artifact, and
-     terminal outcome. Do not provide an implementation estimate.
+     terminal outcome. Do not provide an implementation estimate: no story points,
+     effort size, or delivery estimate, even alongside a time box.
+     Use exactly one terminal label: Ready to shape, More Discovery, or Stop; do
+     not invent a synonym such as Inconclusive.
    - **Project:** identify the sequencing goal and the Discovery questions needed
      before delivery bundles are trustworthy.
    - **MiniProject:** gather a stated answer for each bundle criterion, then run
@@ -63,5 +66,9 @@ improvement or return it to Discovery.
   owner's plan unless another participant needs visibility.
 - Do not turn a MiniProject into one giant change. End-to-end ownership and small
   reviewable changes are compatible.
+- When staffing one MiniProject across several people, name one accountable owner and label every other participant as a contributor; never assign contributors ownership of UI, API, data, verification, rollout, or another technical-layer slice.
+- In an ownership answer, use accountable only for the one end-to-end owner.
+  Specialists may lead or implement technical work as contributors, but do not call
+  a specialist accountable for a technical slice.
 - State uncertainty directly. Route unclear work to Discovery instead of forcing
   a confident bundle.

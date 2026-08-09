@@ -55,3 +55,36 @@ def test_chore_bypass_is_an_explicit_skill_rule():
 def test_validator_is_executable():
     validator = SKILL / "scripts" / "validate_bundle.py"
     assert validator.stat().st_mode & 0o111
+
+
+def test_discovery_rule_forbids_points_even_beside_a_time_box():
+    text = (SKILL / "references" / "estimation-policy.md").read_text().lower()
+    assert "story points" in text
+    assert "alongside a time box" in text
+
+
+def test_discovery_uses_only_the_canonical_terminal_labels():
+    text = " ".join((SKILL / "SKILL.md").read_text().lower().split())
+    assert "use exactly one terminal label" in text
+    assert "ready to shape, more discovery, or stop" in text
+    assert "do not invent a synonym such as inconclusive" in text
+
+
+def test_contributors_do_not_own_technical_slices_inside_one_miniproject():
+    text = " ".join(
+        (SKILL / "references" / "bundling-criteria.md").read_text().lower().split()
+    )
+    assert "contributors" in text
+    assert "do not own technical-layer slices" in text
+
+
+def test_skill_uses_contributor_labels_under_parallel_staffing():
+    text = " ".join((SKILL / "SKILL.md").read_text().lower().split())
+    assert "label every other participant as a contributor" in text
+    assert "never assign contributors ownership" in text
+
+
+def test_skill_reserves_accountability_for_the_end_to_end_owner():
+    text = " ".join((SKILL / "SKILL.md").read_text().lower().split())
+    assert "use accountable only for the one end-to-end owner" in text
+    assert "do not call a specialist accountable for a technical slice" in text
