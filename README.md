@@ -48,6 +48,7 @@ docs/                   Design documents
 
 ## Design docs
 
+- [MiniProject user guide](docs/user-guide.md) — practical workflows, prompts, examples, validator interpretation, and planning checklists
 - [MiniProject operating model](docs/miniproject-model.md) — the methodology this skill implements
 - [Implementation plan](docs/implementation-plan.md) — phased plan with falsification gate
 - [Behavioral testing approach](docs/behavioral-testing.md) — how LLM-driven skills get tested
