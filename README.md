@@ -51,6 +51,7 @@ docs/                   Design documents
 - [MiniProject operating model](docs/miniproject-model.md) — the methodology this skill implements
 - [Implementation plan](docs/implementation-plan.md) — phased plan with falsification gate
 - [Behavioral testing approach](docs/behavioral-testing.md) — how LLM-driven skills get tested
+- [Hardening and behavioral testing report](docs/hardening-and-behavioral-testing-report.md) — methodology, results, evidence boundaries, cost, and remaining risks
 
 ## Why behavioral testing matters here
 
