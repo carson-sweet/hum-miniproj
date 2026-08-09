@@ -43,6 +43,8 @@ Gated on P0.3 from MS-001. If Variant B came in under 80%, the plan cuts MS-006 
 
 The disabled-writer mutation was detected in Codex `20260809T132857Z-300024000`, Claude `20260809T132857Z-786906000`, and Junie `20260809T133153Z-367075000`. The first Junie mutation run exposed an attempted direct repair after the writer failed; the skill now forbids shell, file-tool, alternate-script, and manual-register bypasses, and a deterministic package test enforces that instruction.
 
+The finalized mutation later qualified at 5/5 in Codex, 5/5 in Junie, and 5/5 in Claude under run `20260809T143303Z-055364000`, exceeding the 4/5 per-harness floor.
+
 `register_append.py` is named as the only writer in `references/improvement-register.schema.json`; it validates both existing and new entries before appending under an exclusive lock. `register_verify.py` validates the whole register and can require the exact source session and at least one non-seed entry.
 
 ---
@@ -51,6 +53,7 @@ The disabled-writer mutation was detected in Codex `20260809T132857Z-300024000`,
 
 | Version | Date       | Change summary                                          |
 |---------|------------|---------------------------------------------------------|
+| 1.3     | 2026-08-09 | Recorded three-harness five-run mutation qualification. |
 | 1.2     | 2026-08-09 | Completed live capture, schema, verifier, and mutation gates. |
 | 1.1     | 2026-08-08 | Added YAML frontmatter; status to canonical vocabulary. |
 | 1.0     | 2026-08-08 | Imported from `docs/implementation-plan.md` v1.0 (MP-5). |

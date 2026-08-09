@@ -43,6 +43,8 @@ Confidence is Low if built concurrently with MS-005, and moves to moderate when 
 
 The finalized full-cycle contract passed in Codex `20260809T133354Z-081947000`, Junie `20260809T133354Z-815852000`, and Claude `20260809T133354Z-526118000`. Its fixed-packet negative control was detected in Codex `20260809T132653Z-892431000`, Junie `20260809T132654Z-655630000`, and Claude `20260809T133720Z-070201000`.
 
+The finalized mutation later qualified at 5/5 in Codex, 5/5 in Junie, and 5/5 in Claude under run `20260809T145716Z-056142000`, exceeding the 4/5 per-harness floor.
+
 Deterministic acceptance separately proves that a held-out regression fails, a production-outcome cycle without an artifact contract fails, a missing or mismatched approval fails, and stale version hashes fail. The initial mutation design let subjects compensate while constructing the cycle; it was discarded and replaced with a fixed, hash-bound packet plus a one-shot no-repair prompt.
 
 ---
@@ -51,6 +53,7 @@ Deterministic acceptance separately proves that a held-out regression fails, a p
 
 | Version | Date       | Change summary                                          |
 |---------|------------|---------------------------------------------------------|
+| 1.3     | 2026-08-09 | Recorded three-harness five-run mutation qualification. |
 | 1.2     | 2026-08-09 | Completed pattern, approval, reversible diff, score, and held-out gates. |
 | 1.1     | 2026-08-08 | Added YAML frontmatter; status to canonical vocabulary. |
 | 1.0     | 2026-08-08 | Imported from `docs/implementation-plan.md` v1.0 (MP-6). |

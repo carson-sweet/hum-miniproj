@@ -1,10 +1,10 @@
 # Hardening and Behavioral Testing Report
 
-**Version 1.0 — 2026-08-09**
+**Version 1.1 — 2026-08-09**
 
 **Author: Eigen (synthetic cognitive entity)**
 
-**Decision: the implemented MiniProject workflows pass their recorded normal three-harness checks. The foundational and human-output contract groups meet the configured repeated-mutation floor. Semantic contracts MP-C05 through MP-C08 have normal acceptance evidence but have not received five-run mutation qualification.**
+**Decision: the implemented MiniProject workflows pass their recorded normal three-harness checks. The foundational, human-output, and continuous-improvement contract groups meet the configured repeated-mutation floor. Semantic contracts MP-C05 through MP-C08 have normal acceptance evidence but have not received five-run mutation qualification.**
 
 ## Executive summary
 
@@ -12,13 +12,15 @@ The MiniProject skill is tested as both deterministic software and probabilistic
 
 The current evidence is:
 
-- 196 deterministic tests passed, with four paid integration tests deselected.
+- 219 deterministic tests passed, with four paid integration tests deselected.
 - Portability lint and the standard Agent Skill validator passed.
-- All 14 current contracts have a recorded normal pass in all three harnesses: 42 of 42 unique contract-harness cells.
+- All 16 current contracts have a recorded normal pass in all three harnesses: 48 of 48 unique contract-harness cells.
 - MP-C01 through MP-C04 detected their mutations 60 of 60 times.
 - MP-C09 through MP-C14 detected their mutations 89 of 90 times. Every contract-harness cell met the configured 4-of-5 floor; MP-C11 on Codex was exactly 4 of 5.
+- MP-C15 and MP-C16 detected their mutations 30 of 30 times. Every contract-harness cell passed 5 of 5.
 - MP-C05 through MP-C08 passed normally in all three harnesses, but their declared semantic mutations have not been sampled five times per harness.
 - The hardening phase used $8.6668 of metered model usage against a user-approved $10 ceiling. Forty-four Junie calls in that phase exposed no provider usage data and therefore have unknown cost.
+- The bounded MP-C15/MP-C16 hardening phase used $4.6211 of metered model usage against a $6 ceiling. Ten Junie calls in that phase exposed no provider usage data and therefore have unknown cost.
 
 This establishes contract compliance for the tested prompts and environments. It does not establish general product quality, behavior under arbitrary paraphrases, or reliability in long sessions where other instructions compete for attention.
 
@@ -36,13 +38,14 @@ The behavioral runner is `eval/run_contracts.py`. Contract definitions are in `e
 
 ### Claims tested
 
-The 14 current contracts cover four evidence groups:
+The 16 current contracts cover five evidence groups:
 
 | Group | Contracts | Claim |
 | --- | --- | --- |
 | Foundational behavior | MP-C01–MP-C04 | Discovery closeout, presence-only validation, technical-layer rejection, and one accountable owner |
 | User-story semantics | MP-C05–MP-C08 | Complete splits, refinement and estimation, Discovery shaping, and request routing |
 | Human-readable output | MP-C09–MP-C14 | Exact plain-language results for all six interactive validator/router workflows |
+| Continuous improvement | MP-C15–MP-C16 | Live improvement capture and a gated, non-self-applying improvement cycle |
 | Portability | all claimed harnesses | The same production skill works in Codex, Junie, and Claude |
 
 ## Testing methodology
@@ -89,7 +92,7 @@ Normal acceptance is one pass per contract and harness. It proves that the intac
 
 ### 4. Artifact assertions are preferred for outcomes
 
-Thirteen current contracts assert on produced files. MP-C04 is the sole response-judged contract because its claim concerns how accountability is framed. Artifact contracts check that a file exists and matches the required structure or content. This prevents a fluent explanation of what should be done from passing when the requested work was never performed.
+Fifteen current contracts assert on produced files. MP-C04 is the sole response-judged contract because its claim concerns how accountability is framed. Artifact contracts check that a file exists and matches the required structure or content. This prevents a fluent explanation of what should be done from passing when the requested work was never performed.
 
 Human-readable contracts MP-C09 through MP-C14 are stricter: the prompt requires the agent to run the bundled script with human formatting and redirect that script's standard output directly to the report file. The agent is explicitly forbidden from reconstructing or editing the report. Assertions match the entire file using start and end anchors, allowing only an optional trailing newline.
 
@@ -170,14 +173,14 @@ An early capture run treated missing output as a behavioral failure even though 
 
 | Check                                   |                   Result |
 | --------------------------------------- | -----------------------: |
-| Pytest excluding paid integration tests | 196 passed, 4 deselected |
+| Pytest excluding paid integration tests | 219 passed, 4 deselected |
 | Portability lint                        |                     PASS |
 | Agent Skill validator                   |                     PASS |
 | Diff whitespace check                   |                     PASS |
 
 ### Normal three-harness acceptance
 
-Every current contract has at least one trustworthy normal pass on Codex, Junie, and Claude: 42 of 42 unique contract-harness cells.
+Every current contract has at least one trustworthy normal pass on Codex, Junie, and Claude: 48 of 48 unique contract-harness cells.
 
 | Contract | Behavior                                 | Codex | Junie | Claude |
 | -------- | ---------------------------------------- | ----: | ----: | -----: |
@@ -195,8 +198,10 @@ Every current contract has at least one trustworthy normal pass on Codex, Junie,
 | MP-C12   | Human-readable estimation result         |  PASS |  PASS |   PASS |
 | MP-C13   | Human-readable Discovery result          |  PASS |  PASS |   PASS |
 | MP-C14   | Human-readable routing results           |  PASS |  PASS |   PASS |
+| MP-C15   | Live improvement capture                 |  PASS |  PASS |   PASS |
+| MP-C16   | Gated improvement cycle                  |  PASS |  PASS |   PASS |
 
-The foundational matrix is recorded under run `20260809T000730Z-541029000`. User-story semantic runs for MP-C05 through MP-C08 are `20260809T004140Z-281271000`, `20260809T004450Z-480971000`, `20260809T004724Z-586238000`, and `20260809T005019Z-203062000`. The exact human-output run IDs appear in the evidence index below.
+The foundational matrix is recorded under run `20260809T000730Z-541029000`. User-story semantic runs for MP-C05 through MP-C08 are `20260809T004140Z-281271000`, `20260809T004450Z-480971000`, `20260809T004724Z-586238000`, and `20260809T005019Z-203062000`. MP-C15 normal runs are `20260809T125850Z-224658000`, `20260809T125851Z-116791000`, and `20260809T125850Z-690736000`; MP-C16 normal runs are `20260809T133354Z-081947000`, `20260809T133354Z-815852000`, and `20260809T133354Z-526118000`. The exact human-output run IDs appear in the evidence index below.
 
 ### Repeated negative-control qualification
 
@@ -216,8 +221,10 @@ The foundational matrix is recorded under run `20260809T000730Z-541029000`. User
 | MP-C12 | 5/5 | 5/5 | 5/5 | 15/15 | qualified |
 | MP-C13 | 5/5 | 5/5 | 5/5 | 15/15 | qualified |
 | MP-C14 | 5/5 | 5/5 | 5/5 | 15/15 | qualified |
+| MP-C15 | 5/5 | 5/5 | 5/5 | 15/15 | qualified |
+| MP-C16 | 5/5 | 5/5 | 5/5 | 15/15 | qualified |
 
-Across the two qualified groups, mutations were detected 149 of 150 times. This aggregate is descriptive only; qualification is decided per contract and harness, not by allowing strong cells to hide a weak one.
+Across the three qualified groups, mutations were detected 179 of 180 times. This aggregate is descriptive only; qualification is decided per contract and harness, not by allowing strong cells to hide a weak one.
 
 ### Live user tests
 
@@ -249,9 +256,22 @@ The hardening phase began at `2026-08-09T03:04:43Z` with a user-approved metered
 
 The total includes contaminated and aborted diagnostic calls, not only the runs in the decision tables.
 
+### MP-C15 and MP-C16 hardening phase
+
+The continuous-improvement hardening phase began at `2026-08-09T14:32:49Z` with a $6 metered ceiling and $0.75 reserved before each next subject call. The two contract matrices ran sequentially so they shared one reliable budget window.
+
+| Measure                            |  Result |
+| ---------------------------------- | ------: |
+| Recorded calls                     |      40 |
+| Metered calls                      |      30 |
+| Metered cost                       | $4.6211 |
+| Junie calls with unavailable usage |      10 |
+
+MP-C15 used $1.8271 metered; MP-C16 used $2.7940 metered. No diagnostic retries or excluded runs were needed in this phase.
+
 ### Repository ledger boundary
 
-As of this report, the repository ledger contains 952 recorded calls and $20.9636 of metered cost, plus 172 calls on unpriced models. That is not the all-project cost. Metering was added after substantial earlier activity, Junie text mode does not expose usage, and costs incurred outside the ledger cannot be reconstructed from repository evidence. The ledger therefore must not be presented as a complete spend total.
+As of this report, the three active worktree ledgers contain 1,073 non-overlapping recorded calls and $31.3888 of metered cost, including 210 calls with unavailable pricing. That is not the all-project cost. Metering was added after substantial earlier activity, Junie text mode does not expose usage, and costs incurred outside the ledgers cannot be reconstructed from repository evidence. The ledger total therefore must not be presented as complete spend.
 
 Separately, the user reported $452.19 of spend during the implementation session, before the bounded human-output hardening phase began. That figure is not derivable or reconcilable from the repository ledger and is therefore reported as an external observation rather than combined into a fabricated all-in total. It is material evidence that the ledger total understates actual project cost.
 
@@ -323,6 +343,15 @@ Use `--contract` and `--harness` to qualify one bounded slice instead of spendin
 
 Supporting interpretation and excluded-run notes are in `spikes/human-output-hardening/FINDING.md` and `spikes/user-story-acceptance/FINDING.md`.
 
+### Continuous-improvement acceptance and repeated negative controls
+
+| Contract | Normal run IDs | Five-run negative-control run |
+| --- | --- | --- |
+| MP-C15 | `20260809T125850Z-224658000`; `20260809T125851Z-116791000`; `20260809T125850Z-690736000` | `20260809T143303Z-055364000` |
+| MP-C16 | `20260809T133354Z-081947000`; `20260809T133354Z-815852000`; `20260809T133354Z-526118000` | `20260809T145716Z-056142000` |
+
+Supporting interpretation and excluded-run notes are in `spikes/ms-005-ms-006-acceptance/FINDING.md`.
+
 ## Final assessment
 
-The current skill is working well enough for hands-on use and testing. Its intact behavior passed every recorded normal contract in all three harnesses, and the two repeatedly qualified contract groups demonstrated that their assertions can detect the intended regressions. The evidence is not equivalent to universal reliability: MP-C05 through MP-C08 still need repeated semantic mutation runs, MP-C11 should be strengthened above its current floor, and broader prompt and long-session coverage remain future hardening work.
+The current skill is working well enough for prototype or beta use. Its intact behavior passed every recorded normal contract in all three harnesses, and the three repeatedly qualified contract groups demonstrated that their assertions can detect the intended regressions. Live capture and the gated improvement loop both have 5-of-5 mutation detection in every harness. The evidence is not equivalent to universal reliability: MP-C05 through MP-C08 still need repeated semantic mutation runs, MP-C11 should be strengthened above its current floor, and broader prompt and long-session coverage remain future hardening work.

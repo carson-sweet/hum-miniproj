@@ -7,7 +7,7 @@ complete improvement rather than by technical layer.
 Runs anywhere the Agent Skills standard is supported: Claude Code, Codex, Junie,
 and others.
 
-**Status:** All ten product user stories and all six implementation milestones are complete. The skill now includes verified live improvement capture and a human-approved, non-self-applying improvement loop with reversible diffs, targeted and held-out contract scores, and artifact gates for production outcomes. Broader prompt and long-session hardening remain open.
+**Status:** All ten product user stories and all six implementation milestones are complete. Live improvement capture and the human-approved, non-self-applying improvement loop each passed five-run negative-control qualification in Codex, Junie, and Claude. Broader prompt and long-session hardening remain open.
 
 ## The problem
 
