@@ -1,6 +1,6 @@
 # Human-readable workflow hardening
 
-**Version 1.0 — 2026-08-09**
+**Version 1.1 — 2026-08-09**
 **Verdict: PASS at the configured 80% negative-control floor.**
 
 ## Scope
@@ -8,7 +8,7 @@
 MP-C09 through MP-C14 require exact plain-language output for bundle validation,
 split validation, Tech Refinement, Tech Estimation, Discovery-plan validation,
 and request routing. Each artifact must be created by redirecting the bundled
-script's human-formatted stdout, not reconstructed by the subject.
+script's human-formatted stdout, not reconstructed by the subject. The final contracts also forbid modifying or repairing the installed skill or validator.
 
 ## Isolation defect found and fixed
 
@@ -42,14 +42,12 @@ preflights and their pre-isolation Codex cells are discarded.
 |---|---:|---:|---:|---|
 | MP-C09 | 5/5 | 5/5 | 5/5 | `20260809T033449Z-260543000`; `20260809T034014Z-920973000` |
 | MP-C10 | 5/5 | 5/5 | 5/5 | `20260809T034439Z-409022000` |
-| MP-C11 | 4/5 | 5/5 | 5/5 | `20260809T035657Z-296839000` |
+| MP-C11 | 5/5 | 5/5 | 5/5 | Junie and Claude `20260809T035657Z-296839000`; final Codex `20260809T175326Z-101952000` |
 | MP-C12 | 5/5 | 5/5 | 5/5 | `20260809T041005Z-487095000` |
 | MP-C13 | 5/5 | 5/5 | 5/5 | `20260809T042033Z-092977000` |
 | MP-C14 | 5/5 | 5/5 | 5/5 | `20260809T043354Z-604641000` |
 
-Detection was 89/90 overall. Every contract-harness cell met the configured 4/5
-floor. MP-C11 Codex sits exactly at that floor and should be treated as fragile,
-not as evidence of excess reliability.
+The original phase detected 89 of 90 mutations, with MP-C11 Codex exactly at the 4-of-5 floor. Follow-up hardening added a deterministic no-repair contract guard and reran that cell at 5 of 5. The final qualified human-output cells therefore detected 90 of 90 mutations. Normal Codex verification after the guard passed under run `20260809T180243Z-040169000`.
 
 ## Budget
 
@@ -64,4 +62,3 @@ than treated as zero cost.
 
 - Exact contract prompts are hardened; broader paraphrase coverage is not.
 - Long-session competition for attention is not measured.
-- MP-C11 Codex has no detection margin above the 80% floor.

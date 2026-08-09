@@ -15,7 +15,8 @@ subject:
     Record Engineering acceptance with no returned cards. Run the bundled Discovery-
     plan validator with human formatting and redirect stdout directly to
     discovery-report.txt in that command. Do not reconstruct or edit the report by
-    any other means. Do the work; do not merely describe the commands.
+    any other means. Do not modify or repair the installed MiniProject skill or
+    validator. Do the work; do not merely describe the commands.
   sandbox: workspace-write
   timeout_s: 240
   models:

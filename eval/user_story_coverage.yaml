@@ -53,3 +53,24 @@ US-REQ-001:
     - skills/miniproject/references/workflows.md
   acceptance_tests:
     - eval/tests/test_route_request.py
+US-IMP-001:
+  status: implemented
+  implementation:
+    - skills/miniproject/scripts/register_append.py
+    - skills/miniproject/scripts/register_verify.py
+    - skills/miniproject/references/improvement-register.schema.json
+  acceptance_tests:
+    - eval/tests/test_improvement_capture.py
+    - eval/contracts/mp-c15-improvement-capture.yaml
+US-IMP-002:
+  status: implemented
+  implementation:
+    - skills/miniproject/scripts/analyze_improvements.py
+    - skills/miniproject/scripts/propose_improvement.py
+    - skills/miniproject/scripts/record_improvement_approval.py
+    - skills/miniproject/scripts/record_instruction_version.py
+    - skills/miniproject/scripts/validate_improvement_cycle.py
+    - skills/miniproject/references/improvement-loop.md
+  acceptance_tests:
+    - eval/tests/test_improvement_loop.py
+    - eval/contracts/mp-c16-improvement-loop.yaml

@@ -13,8 +13,9 @@ subject:
     specific-report.txt in that command. Route "Improve onsite optimization" with
     shaping owner Chelsea and redirect stdout directly to broad-report.txt in that
     human-formatted command. Do not reconstruct or edit either report by any other
-    means. Do the work by running the bundled script; do not merely describe the
-    expected routes.
+    means. Do not modify or repair the installed MiniProject skill or validator. Do
+    the work by running the bundled script; do not merely describe the expected
+    routes.
   sandbox: workspace-write
   timeout_s: 180
   models:

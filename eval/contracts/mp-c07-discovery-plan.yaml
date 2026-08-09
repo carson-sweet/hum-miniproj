@@ -14,7 +14,8 @@ subject:
     Discovery cards; every card must have a question, owner, and useful output and no
     technical bundle. Record Engineering review as accepted with zero returned cards.
     Run the bundled Discovery-plan validator and save its exact output as
-    discovery-plan-result.json. Do the work; do not merely describe it.
+    discovery-plan-result.json. Do the work; do not merely describe it. Do not
+    modify or repair the installed MiniProject skill or validator.
   sandbox: workspace-write
   timeout_s: 240
   models:

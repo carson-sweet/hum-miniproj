@@ -18,7 +18,8 @@ subject:
     Chore and MiniProject with effort_estimate values plus a Discovery with a
     time_box and target_output and no effort or story points. Save its exact
     validator output as estimation-result.json. Do the work, including running the
-    bundled board validator twice; do not merely describe it.
+    bundled board validator twice; do not merely describe it. Do not modify or
+    repair the installed MiniProject skill or validator.
   sandbox: workspace-write
   timeout_s: 300
   models:

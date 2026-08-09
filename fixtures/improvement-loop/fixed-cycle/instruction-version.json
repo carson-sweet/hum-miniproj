@@ -1,0 +1,18 @@
+{
+  "content_sha256": "7e294efa8d9486918fa491efbd0d87ba0ac6f87ea347a170ecb0dbb736be72cf",
+  "previous_content_sha256": "0ccdeec4b0722bce32127e27d49ac8dde47bc5d391ac34afb66558516ac106ef",
+  "proposal_id": "proposal-b8aafa0d78949651",
+  "schema_version": 1,
+  "scores": {
+    "held_out": {
+      "after": {"passed": 9, "total": 10},
+      "before": {"passed": 9, "total": 10}
+    },
+    "targeted": {
+      "after": {"passed": 5, "total": 5},
+      "before": {"passed": 3, "total": 5}
+    }
+  },
+  "target": "SKILL.md",
+  "version_id": "skill-v2-acceptance"
+}

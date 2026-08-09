@@ -6,6 +6,8 @@ The skill classifies and routes work as a **Project**, **Discovery**, **MiniProj
 
 It supports Codex, Junie, Claude Code, and other harnesses implementing the Agent Skills standard.
 
+**Status:** All ten product user stories and all six implementation milestones are complete. All 16 behavioral contracts passed five-run negative-control qualification in Codex, Junie, and Claude. Broader prompt-paraphrase and long-session hardening remain open.
+
 ## Quick start / TL;DR
 
 Install the skill for Codex, Junie, and Claude Code:
@@ -120,13 +122,30 @@ The bundled validators provide stable mechanical checks. A valid result means th
 
 For example, the single-bundle validator checks that all four criterion answers are stated and rejects an explicitly technical-layer-only boundary. It does not otherwise grade answer quality. When both checks are needed, ask the agent to report the deterministic result first and the human-quality assessment separately.
 
-## Project status
+## Project status and testing summary
 
-All eight product user stories are implemented. The current skill has deterministic coverage and recorded normal behavioral passes across Codex, Junie, and Claude for all 14 contracts. The foundational and human-output contract groups have repeated negative-control qualification; semantic contracts MP-C05 through MP-C08 have normal three-harness acceptance but have not received five-run mutation qualification.
+The implementation plan is complete. The current release candidate includes all ten product user stories and all six milestones.
 
-Known limits include narrow prompt coverage, no long-session reliability measurement, one Codex human-output contract at the 4-of-5 qualification floor, unknown Junie text-mode cost, and local gitignored raw run artifacts.
+| Evidence | Final result |
+| --- | ---: |
+| Product implementation | 10 of 10 user stories; 6 of 6 milestones |
+| Deterministic suite | 220 passed; 4 paid integration tests deselected |
+| Portability lint | PASS |
+| Standard Agent Skill validation | PASS |
+| Normal behavioral acceptance | 48 of 48 contract-harness cells passed |
+| Repeated negative-control qualification | 240 of 240 final mutations detected |
+| Per-cell mutation result | Every cell passed 5 of 5, exceeding the configured 4-of-5 floor |
+| Harnesses | Codex, Junie, and Claude |
 
-See the [Hardening and Behavioral Testing Report](docs/hardening-and-behavioral-testing-report.md) for exact results, evidence boundaries, excluded runs, cost, and limitations.
+The 16 behavioral contracts cover foundational MiniProject rules, user-story semantics, human-readable workflow results, and the continuous-improvement workflow. Fifteen assert on produced artifacts; one judges the response because its requirement concerns how accountable ownership is framed. Five mutation repetitions were run for every contract in every harness, so a strong aggregate cannot hide a weak contract-harness cell.
+
+Bundle validation and split validation also passed manual fresh-session user tests after the first bundle test exposed raw JSON as unusable output. The other four human-output workflows have automated three-harness evidence but have not each received a separate manual fresh-session user test.
+
+The repository ledgers contain 1,190 recorded calls and $39.1985 in metered model fees. Of those calls, 248 have unavailable pricing, and substantial early work predates metering. This is therefore a lower bound, not an all-project total.
+
+The evidence establishes compliance for the recorded prompts, models, CLI versions, and isolated environments. Arbitrary prompt paraphrases, long-session instruction competition, persuasive answer quality, and future model drift remain outside the measured scope. These are beta limitations, not unfinished implementation-plan milestones.
+
+See the [Hardening and Behavioral Testing Report](docs/hardening-and-behavioral-testing-report.md) for methodology, run identifiers, exclusions, cost boundaries, the final-results amendment, and remaining risks.
 
 ## Documentation
 

@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "cycle_id": "cycle-fixed-001",
+  "proposal": "proposal.json",
+  "approval": "approval.json",
+  "contract": "target-contract.json",
+  "instruction_version": "instruction-version.json",
+  "production_outcome": true,
+  "scores": {
+    "targeted": {
+      "before": {"passed": 3, "total": 5},
+      "after": {"passed": 5, "total": 5}
+    },
+    "held_out": {
+      "before": {"passed": 9, "total": 10},
+      "after": {"passed": 9, "total": 10}
+    }
+  }
+}

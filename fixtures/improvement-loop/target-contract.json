@@ -1,0 +1,18 @@
+{
+  "id": "MP-IMPROVEMENT-ACCEPTANCE",
+  "assert": {
+    "type": "artifact",
+    "checks": [
+      {"kind": "exists", "path": "bundle-result.json"}
+    ]
+  },
+  "negative_control": {
+    "expect": "FAIL",
+    "mutate": {
+      "file": "SKILL.md",
+      "op": "replace",
+      "pattern": "Reject technical-layer-only bundles.",
+      "value": "Keep technical-layer bundles."
+    }
+  }
+}

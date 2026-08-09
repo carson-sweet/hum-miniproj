@@ -1,0 +1,44 @@
+id: MP-C15
+name: A completed workflow appends a schema-valid improvement entry
+stories: [US-IMP-001]
+targets:
+  - SKILL.md
+  - scripts/register_append.py
+  - scripts/register_verify.py
+subject:
+  fixture: fixtures/throwaway
+  prompt: >-
+    Use the MiniProject skill to route this request: "Fix the spelling of the
+    existing billing-page heading." Complete the selected workflow, run its
+    deterministic script, and return the plain-language result. Follow the
+    skill's full closeout procedure and perform the work rather than merely
+    describing commands.
+  sandbox: workspace-write
+  timeout_s: 240
+  environment:
+    MINIPROJECT_REGISTER: improvement-register.jsonl
+    MINIPROJECT_SOURCE_SESSION: capture-contract-001
+  models:
+    claude: sonnet
+assert:
+  type: artifact
+  checks:
+    - kind: exists
+      path: improvement-register.jsonl
+    - kind: min_lines
+      path: improvement-register.jsonl
+      count: 1
+    - kind: contains
+      path: improvement-register.jsonl
+      pattern: '"type": "(correction|confirmation|preference|pattern)"'
+    - kind: contains
+      path: improvement-register.jsonl
+      pattern: '"source_session": "[^"\s]+"'
+negative_control:
+  expect: FAIL
+  mutate:
+    file: scripts/register_append.py
+    op: replace
+    pattern: 'with register.open("a", encoding="utf-8") as handle:'
+    value: 'with open(os.devnull, "a", encoding="utf-8") as handle:'
+harnesses: [codex, junie, claude]

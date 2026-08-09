@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "clusters": {
+    "pattern-confirmation-references-estimation-policy-md": [
+      "lr-d000000000000001",
+      "lr-d000000000000002"
+    ],
+    "pattern-correction-references-bundling-criteria-md": [
+      "lr-a000000000000001",
+      "lr-a000000000000002"
+    ],
+    "pattern-pattern-references-workflows-md": [
+      "lr-c000000000000001",
+      "lr-c000000000000002"
+    ],
+    "pattern-preference-skill-md": [
+      "lr-b000000000000001",
+      "lr-b000000000000002"
+    ]
+  }
+}

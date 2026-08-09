@@ -12,7 +12,8 @@ subject:
     optimization widget to the sales blog" and save the exact JSON output as
     specific-route.json. Route "Improve onsite optimization" with shaping owner
     Chelsea and save the exact JSON output as broad-route.json. Do the work by
-    running the script; do not merely describe the expected routes.
+    running the script; do not merely describe the expected routes. Do not modify or
+    repair the installed MiniProject skill or validator.
   sandbox: workspace-write
   timeout_s: 180
   models:

@@ -1,4 +1,5 @@
 import json
+import os
 import shutil
 
 import pytest
@@ -16,6 +17,7 @@ from eval.run_contracts import (
     load_contracts,
     select_harnesses,
     select_subject_model,
+    subject_environment,
     validate_contract,
     write_results,
 )
@@ -115,6 +117,48 @@ def test_contract_without_negative_control_is_rejected():
         )
 
 
+def test_contract_rejects_environment_variables_outside_the_capture_allowlist():
+    with pytest.raises(ValueError, match="environment"):
+        validate_contract(
+            {
+                "id": "MP-X",
+                "name": "unsafe environment",
+                "subject": {
+                    "fixture": "fixtures/p0-2",
+                    "prompt": "x",
+                    "environment": {"ANTHROPIC_API_KEY": "do-not-inject"},
+                },
+                "assert": {"type": "response", "pass": "x"},
+                "negative_control": {
+                    "mutate": {
+                        "file": "SKILL.md",
+                        "op": "replace",
+                        "pattern": "MiniProject",
+                        "value": "LargeProject",
+                    }
+                },
+                "harnesses": list(ALL_HARNESSES),
+            }
+        )
+
+
+def test_subject_environment_is_scoped_and_restored(monkeypatch):
+    monkeypatch.setenv("MINIPROJECT_REGISTER", "before.jsonl")
+    monkeypatch.delenv("MINIPROJECT_SOURCE_SESSION", raising=False)
+
+    with subject_environment(
+        {
+            "MINIPROJECT_REGISTER": "improvement-register.jsonl",
+            "MINIPROJECT_SOURCE_SESSION": "capture-contract-001",
+        }
+    ):
+        assert os.environ["MINIPROJECT_REGISTER"] == "improvement-register.jsonl"
+        assert os.environ["MINIPROJECT_SOURCE_SESSION"] == "capture-contract-001"
+
+    assert os.environ["MINIPROJECT_REGISTER"] == "before.jsonl"
+    assert "MINIPROJECT_SOURCE_SESSION" not in os.environ
+
+
 def test_default_selection_uses_each_contract_claim_and_filter_restricts_it():
     contract = {"harnesses": ["codex", "junie", "claude"]}
     assert select_harnesses(contract, None) == ["codex", "junie", "claude"]
@@ -164,6 +208,8 @@ def test_every_user_facing_workflow_has_an_exact_plain_language_contract():
         prompt = contract["subject"]["prompt"].lower()
         assert "redirect stdout directly" in prompt
         assert "do not reconstruct" in prompt
+        assert "do not modify or repair" in prompt
+        assert "installed miniproject skill or validator" in prompt
         patterns = [
             check["pattern"]
             for check in contract["assert"]["checks"]
@@ -177,6 +223,15 @@ def test_every_user_facing_workflow_has_an_exact_plain_language_contract():
         mutation = contract["negative_control"]["mutate"]
         assert mutation["pattern"] == removed_wording
         assert mutation["value"] != removed_wording
+
+
+def test_semantic_artifact_contracts_forbid_subject_repairs():
+    for contract_id in ("MP-C05", "MP-C06", "MP-C07", "MP-C08"):
+        contract = load_contracts(contract_id)[0]
+        prompt = contract["subject"]["prompt"].lower()
+
+        assert "do not modify or repair" in prompt
+        assert "installed miniproject skill or validator" in prompt
 
 
 def test_metered_budget_reserves_room_for_the_next_subject_call(monkeypatch):

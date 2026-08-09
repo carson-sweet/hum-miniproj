@@ -1,6 +1,6 @@
 ---
 name: miniproject
-description: Decide what kind of work a request is and how it belongs on a board; classify and route it as a Project, Discovery, MiniProject, or Chore; shape ranked Discovery cards; run Tech Refinement and Tech Estimation checks; split oversized bundles along complete-improvement boundaries; and validate owner-led, launch-ready MiniProjects. Use during Product Refinement, Tech Refinement, Tech Estimation, sprint planning, work intake, bundle validation, or splitting for any feature, bug, typo, technical-layer ticket, specific customer ask, or broad product goal.
+description: Decide what kind of work a request is and how it belongs on a board; classify and route it as a Project, Discovery, MiniProject, or Chore; shape ranked Discovery cards; run Tech Refinement and Tech Estimation checks; split oversized bundles along complete-improvement boundaries; validate owner-led, launch-ready MiniProjects; capture workflow learnings; and run human-approved improvement cycles. Use during Product Refinement, Tech Refinement, Tech Estimation, sprint planning, work intake, bundle validation, splitting, or improvement review for any feature, bug, typo, technical-layer ticket, specific customer ask, or broad product goal.
 ---
 
 # MiniProject
@@ -42,6 +42,10 @@ multiple small implementation changes and reviews.
    effort or timing.
 6. Read [decision-points.md](references/decision-points.md) when facilitating
    prioritization, refinement, estimation, or sprint selection.
+7. Close every completed workflow with the improvement-capture procedure below.
+8. Read [improvement-loop.md](references/improvement-loop.md) when analyzing the
+   register or proposing an instruction improvement. Its approval and held-out gates
+   are mandatory.
 
 ## Execute the selected workflow
 
@@ -78,6 +82,51 @@ did not perform.
 The validator checks answer presence and rejects an explicitly technical-layer-only
 boundary. It does not grade whether any other answer is persuasive. If it reports
 findings, revise or split the work and rerun it.
+
+## Capture an improvement learning
+
+Before returning the final result for a completed workflow, append exactly one concise
+procedural learning to the improvement register and verify that this session added it.
+Prefer a user correction, then a stated preference, then a recurring pattern; otherwise
+record a confirmation of the rule the completed workflow exercised. Never capture secrets,
+credentials, customer data, or a transcript.
+
+Resolve this skill's directory from the loaded `SKILL.md`. Choose a source-session value
+that uniquely identifies the current interaction and reuse the same value for both calls.
+Use the active harness name and the instruction file most directly concerned as `--skill`.
+Honor `MINIPROJECT_REGISTER` or an explicit user-provided register path; otherwise the
+scripts use `~/.local/share/miniproject/improvement-register.jsonl`.
+
+```bash
+python3 <skill-dir>/scripts/register_append.py \
+  --type <correction|confirmation|preference|pattern> \
+  --learning "<durable procedural learning>" \
+  --harness <codex|junie|claude|other> \
+  --skill <target instruction path> \
+  --source-session <current-session-id>
+python3 <skill-dir>/scripts/register_verify.py \
+  --source-session <current-session-id> --require-live
+```
+
+If verification fails, do not claim capture succeeded. Correct the append input and rerun
+both scripts. `register_append.py` is the register's only writer. Import the bundled seed
+corpus through its `--import-seed references/improvement-seed.jsonl` option; seed entries never
+satisfy live-capture verification.
+
+Never create, edit, repair, or append to the register through shell redirection, a file-edit
+tool, another script, or manually constructed JSON. If `register_append.py` cannot write a
+valid entry, report capture failure; do not bypass the only-writer boundary to satisfy the
+verifier.
+
+## Run an improvement cycle
+
+Follow [improvement-loop.md](references/improvement-loop.md). Analyze only after live
+capture is proven, prepare a candidate in a separate file, and generate a reversible diff.
+Never apply the proposal. Stop for explicit human approval, add a targeted contract with a
+negative control, measure the current and candidate instructions against both targeted and
+held-out contracts, record the version scores, and run
+`scripts/validate_improvement_cycle.py`. A held-out regression or missing approval blocks
+the cycle.
 
 ## Interaction rules
 
