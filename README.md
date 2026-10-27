@@ -1,10 +1,8 @@
 # hum-miniproj
 
-A portable [Agent Skill](https://agentskills.io) for organizing AI-accelerated delivery around complete improvements instead of frontend, backend, data, infrastructure, testing, and rollout handoffs.
+A portable [Agent Skill](https://agentskills.io) for organizing AI-accelerated delivery around complete improvements instead of frontend, backend, data, infrastructure, testing, and rollout handoffs. The underlying methodology was shared by Niall Little, CTO & Co-founder of Hum (https://hum.works). Their advanced AI platform, Alchemist, acts as an intelligent brain and nervous system of modern publishing - transforming data into meaningful connections, insights, and opportunities. 
 
-The skill classifies and routes work as a **Project**, **Discovery**, **MiniProject**, or **Chore**; shapes broad goals; validates owner-led delivery bundles; splits oversized work; closes Tech Refinement; and checks Tech Estimation.
-
-It supports Codex, Junie, Claude Code, and other harnesses implementing the Agent Skills standard.
+The skill classifies and routes work as a **Project**, **Discovery**, **MiniProject**, or **Chore**; shapes broad goals; validates owner-led delivery bundles; splits oversized work; closes Tech Refinement; and checks Tech Estimation. It supports Codex, Junie, Claude Code, and other harnesses implementing the Agent Skills standard.
 
 **Status:** All ten product user stories and all six implementation milestones are complete. All 16 behavioral contracts passed five-run negative-control qualification in Codex, Junie, and Claude. Broader prompt-paraphrase and long-session hardening remain open.
 
